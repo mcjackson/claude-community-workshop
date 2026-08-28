@@ -6,14 +6,8 @@
 
 	type IconName = 'shelter' | 'food' | 'medical' | 'crisis' | 'substance' | 'weather' | 'id' | 'case';
 
-	type Category = {
-		name: string;
-		description: string;
-		icon: IconName;
-	};
-
 	// Maps ServiceDirectory.public_resource_type (docs/homelessness-handoff-directory.csv)
-	// onto the same icon set used for the categories above.
+	// onto categoryIcon's icon set below.
 	const directoryIcons: Record<string, IconName> = {
 		'medical respite': 'medical',
 		'family shelter': 'shelter',
@@ -26,56 +20,6 @@
 	function directoryIcon(type: string): IconName {
 		return directoryIcons[type] ?? 'case';
 	}
-
-	const categories: Category[] = [
-		{
-			name: 'Emergency Shelter',
-			description: 'Same-night beds, family and youth intake, DV-safe placements.',
-			icon: 'shelter'
-		},
-		{
-			name: 'Food & Meals',
-			description: 'Hot meals, pantries, and mobile food units open right now.',
-			icon: 'food'
-		},
-		{
-			name: 'Medical Care',
-			description: 'Street medicine teams, urgent care, and wound follow-up.',
-			icon: 'medical'
-		},
-		{
-			name: 'Mental Health & Crisis',
-			description: 'Mobile crisis response and walk-in behavioral health.',
-			icon: 'crisis'
-		},
-		{
-			name: 'Substance Use Support',
-			description: 'Detox beds, harm reduction, and same-day treatment referral.',
-			icon: 'substance'
-		},
-		{
-			name: 'Warming & Cooling Centers',
-			description: 'Extreme-weather sites with hours and current capacity.',
-			icon: 'weather'
-		},
-		{
-			name: 'ID & Documents',
-			description: 'Help replacing ID, birth certificates, and benefit paperwork.',
-			icon: 'id'
-		},
-		{
-			name: 'Case Management',
-			description: 'Warm handoff to an outreach worker for ongoing follow-up.',
-			icon: 'case'
-		}
-	];
-
-	const stats: { value: string; label: string }[] = [
-		{ value: '24/7', label: 'Dispatch coverage' },
-		{ value: '340+', label: 'Partner service sites' },
-		{ value: '<6 min', label: 'Avg. outreach response' },
-		{ value: '19', label: 'Counties connected' }
-	];
 
 	const steps: { title: string; description: string }[] = [
 		{
@@ -115,7 +59,9 @@
 			class="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(78,163,169,0.35),transparent_55%),radial-gradient(circle_at_85%_0%,rgba(253,126,15,0.18),transparent_45%)]"
 			aria-hidden="true"
 		></div>
-		<div class="relative mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-28 lg:px-8">
+		<div
+			class="relative mx-auto grid max-w-7xl grid-cols-1 items-center gap-12 px-4 py-20 sm:px-6 sm:py-28 lg:grid-cols-2 lg:px-8"
+		>
 			<div class="max-w-2xl">
 				<p class="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold tracking-wide text-brand-100 uppercase">
 					<span class="h-1.5 w-1.5 rounded-full bg-signal-400"></span>
@@ -136,10 +82,10 @@
 						Start a Relay Card
 					</a>
 					<a
-						href="#services"
+						href="#directory"
 						class="inline-flex items-center justify-center rounded-lg border border-white/20 bg-white/5 px-6 py-3.5 text-base font-semibold text-white transition hover:bg-white/10"
 					>
-						Find Services Near Me
+						Browse the Directory
 					</a>
 				</div>
 				<a
@@ -149,18 +95,12 @@
 					See how it works
 				</a>
 			</div>
-		</div>
 
-		<!-- Stats strip -->
-		<div class="relative border-t border-white/10 bg-black/15">
-			<dl class="mx-auto grid max-w-7xl grid-cols-2 gap-6 px-4 py-8 sm:px-6 lg:grid-cols-4 lg:px-8">
-				{#each stats as stat (stat.label)}
-					<div>
-						<dt class="text-xs font-medium tracking-wide text-brand-200 uppercase">{stat.label}</dt>
-						<dd class="mt-1 text-2xl font-extrabold text-white sm:text-3xl">{stat.value}</dd>
-					</div>
-				{/each}
-			</dl>
+			<div class="flex justify-center lg:justify-end">
+				<div class="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl sm:max-w-md">
+					<img src="/ai-project.png" alt="CareGrid" class="h-auto w-full" />
+				</div>
+			</div>
 		</div>
 	</section>
 
@@ -260,58 +200,12 @@
 		</svg>
 	{/snippet}
 
-	<!-- Service categories -->
-	<section id="services" class="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
-		<div class="max-w-2xl">
-			<h2 class="text-sm font-bold tracking-wide text-brand-600 uppercase">What do they need?</h2>
-			<p class="mt-2 text-3xl font-extrabold tracking-tight text-brand-950 sm:text-4xl">
-				Search by service, not by directory.
-			</p>
-			<p class="mt-3 text-base text-brand-700">
-				Every category below filters to sites that are open now, near your location, with capacity
-				to take a referral.
-			</p>
-		</div>
-
-		<div class="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-			{#each categories as category (category.name)}
-				<button
-					type="button"
-					class="group flex flex-col rounded-xl border border-brand-100 bg-white p-5 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-brand-300 hover:shadow-md"
-				>
-					<span
-						class="flex h-11 w-11 items-center justify-center rounded-lg bg-brand-50 text-brand-700 transition group-hover:bg-brand-700 group-hover:text-white"
-						aria-hidden="true"
-					>
-						{@render categoryIcon(category.icon)}
-					</span>
-					<h3 class="mt-4 text-base font-bold text-brand-950">{category.name}</h3>
-					<p class="mt-1.5 text-sm leading-relaxed text-brand-700">{category.description}</p>
-					<span
-						class="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-brand-600 group-hover:text-signal-600"
-					>
-						View nearby sites
-						<svg viewBox="0 0 24 24" fill="none" class="h-4 w-4 transition group-hover:translate-x-0.5">
-							<path
-								d="M5 12H19M19 12L13 6M19 12L13 18"
-								stroke="currentColor"
-								stroke-width="2"
-								stroke-linecap="round"
-								stroke-linejoin="round"
-							/>
-						</svg>
-					</span>
-				</button>
-			{/each}
-		</div>
-	</section>
-
 	<!-- Service directory -->
 	<section id="directory" class="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
 		<div class="max-w-2xl">
 			<h2 class="text-sm font-bold tracking-wide text-brand-600 uppercase">Full directory</h2>
 			<p class="mt-2 text-3xl font-extrabold tracking-tight text-brand-950 sm:text-4xl">
-				Every site behind the categories above.
+				Every partner site, in one place.
 			</p>
 			<p class="mt-3 text-base text-brand-700">
 				Synthetic partner directory for this demo. Capacity isn't live — confirm by phone before
