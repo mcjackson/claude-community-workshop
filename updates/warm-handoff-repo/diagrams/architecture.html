@@ -1,561 +1,199 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>Warm Handoff — Architecture</title>
+<title>Relay — Architecture</title>
 <style>
-  :root {
-    --bg: #eef1f6;
-    --card: #ffffff;
-    --ink: #1c2530;
-    --sub: #5b6675;
-    --line: #d7dce4;
-    --teal: #127566;
-    --teal-soft: #e3f3f0;
-    --teal-line: #9fd4ca;
-
-    --sender: #fdf1e2;
-    --sender-line: #e9c58c;
-    --sender-ink: #8a5a12;
-
-    --convener: #eaf0fc;
-    --convener-line: #b8c9ee;
-    --convener-ink: #33508f;
-
-    --receiver: #f1eafb;
-    --receiver-line: #cdb7ee;
-    --receiver-ink: #6b3fa0;
-
-    --sor-bg: #fdeceb;
-    --sor-line: #e7a9a2;
-    --sor-ink: #9c3b31;
-
-    --arrow: #7c8797;
-    --shadow: 0 1px 2px rgba(20,30,50,.06), 0 4px 14px rgba(20,30,50,.06);
+  :root{
+    --bg:#eaeef4; --panel:#ffffff; --ink:#16202c; --sub:#5c6675; --faint:#8a94a2;
+    --line:#e0e5ec; --line2:#d0d7e0;
+    --teal:#0f7a68; --teal-ink:#0a5849; --teal-soft:#e6f3f0; --teal-line:#a9d7cd;
+    --amber:#a86a1f; --amber-soft:#fbeeda; --amber-line:#ecc890;
+    --violet:#5b3ea0; --violet-soft:#efe9fa; --violet-line:#cdbcee;
+    --blue:#2f5296; --blue-soft:#e9eefb; --blue-line:#bccbee;
+    --rose:#a53a34; --rose-soft:#fbe9e7; --rose-line:#eab8b2;
+    --shadow-sm:0 1px 2px rgba(20,30,50,.05);
+    --shadow:0 2px 8px rgba(20,30,50,.06), 0 14px 34px rgba(20,30,50,.07);
+    --font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,system-ui,sans-serif;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
   }
+  *{box-sizing:border-box;}
+  body{margin:0;background:radial-gradient(1200px 600px at 50% -10%, #f2f5f9, var(--bg));
+    color:var(--ink);font-family:var(--font);line-height:1.5;padding:34px 16px 52px;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:760px;margin:0 auto;}
 
-  * { box-sizing: border-box; }
+  .head{text-align:center;margin-bottom:26px;}
+  .brand{display:inline-flex;align-items:center;gap:9px;margin-bottom:8px;}
+  .brand .mark{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,var(--teal),#12a189);
+    display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-sm);}
+  .brand .mark svg{width:17px;height:17px;}
+  .brand .name{font-size:1.5rem;font-weight:800;letter-spacing:-.02em;color:var(--ink);}
+  .head .kick{font-size:.72rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--teal);margin:0 0 4px;}
+  .head h1{font-size:1.15rem;margin:0 0 4px;font-weight:600;letter-spacing:-.01em;}
+  .head p{margin:0;color:var(--sub);font-size:.87rem;}
 
-  body {
-    margin: 0;
-    background: var(--bg);
-    color: var(--ink);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    padding: 20px 14px 28px;
-  }
+  .scroll{overflow-x:auto;}
+  .canvas{min-width:520px;}
 
-  .wrap {
-    max-width: 900px;
-    margin: 0 auto;
-  }
+  .lbl{font-size:.66rem;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--faint);
+    text-align:center;margin:0 0 12px;position:relative;}
+  .lbl::before,.lbl::after{content:"";position:absolute;top:50%;width:calc(50% - 92px);height:1px;background:var(--line2);}
+  .lbl::before{left:0;} .lbl::after{right:0;}
 
-  header.page {
-    text-align: center;
-    margin-bottom: 18px;
-  }
+  /* roles */
+  .roles{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px;}
+  .role{border-radius:15px;border:1px solid var(--line2);background:var(--panel);box-shadow:var(--shadow);
+    padding:15px 14px;text-align:center;position:relative;overflow:hidden;}
+  .role::before{content:"";position:absolute;top:0;left:0;right:0;height:4px;}
+  .role.convener::before{background:var(--blue);}
+  .role.sender::before{background:var(--amber);}
+  .role.receiver::before{background:var(--violet);}
+  .role .ic{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;
+    margin:4px auto 9px;font-size:1.15rem;}
+  .role.convener .ic{background:var(--blue-soft);} .role.sender .ic{background:var(--amber-soft);} .role.receiver .ic{background:var(--violet-soft);}
+  .role .tag{display:inline-block;font-size:.6rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;padding:2px 9px;border-radius:999px;margin-bottom:7px;}
+  .role.convener .tag{background:var(--blue-soft);color:var(--blue);}
+  .role.sender .tag{background:var(--amber-soft);color:var(--amber);}
+  .role.receiver .tag{background:var(--violet-soft);color:var(--violet);}
+  .role h3{margin:0 0 4px;font-size:.9rem;letter-spacing:-.01em;}
+  .role p{margin:0;font-size:.74rem;color:var(--sub);line-height:1.4;}
 
-  header.page h1 {
-    margin: 0 0 4px;
-    font-size: 1.35rem;
-    letter-spacing: -0.01em;
-  }
+  .oneroof{display:flex;gap:11px;align-items:flex-start;background:var(--blue-soft);border:1px solid var(--blue-line);
+    border-radius:13px;padding:12px 15px;margin:0 0 14px;}
+  .oneroof .ic{width:30px;height:30px;border-radius:9px;background:#fff;border:1px solid var(--blue-line);
+    display:flex;align-items:center;justify-content:center;font-size:.95rem;flex:none;}
+  .oneroof h4{margin:0 0 4px;font-size:.8rem;color:var(--blue);}
+  .oneroof p{margin:0;font-size:.75rem;color:#3a4b6b;line-height:1.45;}
+  .oneroof b{color:var(--blue);}
 
-  header.page .accent {
-    color: var(--teal);
-  }
+  .conn{display:flex;justify-content:center;align-items:center;gap:8px;margin:2px 0 12px;color:var(--faint);font-size:.72rem;font-weight:600;}
+  .conn .l{height:1px;width:46px;background:var(--line2);}
+  .conn svg{display:block;}
 
-  header.page p {
-    margin: 0;
-    color: var(--sub);
-    font-size: 0.85rem;
-  }
+  /* relay tool hero */
+  .tool{background:linear-gradient(180deg,var(--teal-soft),#fff 62%);border:1.5px solid var(--teal-line);
+    border-radius:18px;box-shadow:var(--shadow);padding:18px 18px 16px;margin-bottom:14px;}
+  .tool-h{text-align:center;margin-bottom:14px;}
+  .tool-h .n{font-size:1.15rem;font-weight:800;color:var(--teal-ink);letter-spacing:-.01em;}
+  .tool-h .s{font-size:.73rem;color:var(--sub);margin-top:2px;}
+  .comps{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;}
+  @media(min-width:600px){.comps{grid-template-columns:repeat(4,1fr);}}
+  .comp{background:#fff;border:1px solid var(--teal-line);border-radius:12px;padding:11px 10px;text-align:center;box-shadow:var(--shadow-sm);}
+  .comp .ic{width:32px;height:32px;border-radius:9px;background:var(--teal-soft);display:flex;align-items:center;justify-content:center;margin:0 auto 7px;font-size:1rem;}
+  .comp h4{margin:0 0 3px;font-size:.76rem;color:var(--ink);}
+  .comp p{margin:0;font-size:.67rem;color:var(--sub);line-height:1.35;}
 
-  .scrollpane {
-    overflow-x: auto;
-    padding-bottom: 4px;
-  }
+  .guards{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:12px;}
+  .guard{display:inline-flex;align-items:center;gap:7px;background:#fbfcfd;border:1px dashed #c6cdd7;border-radius:999px;
+    padding:6px 13px;font-size:.72rem;color:#5c6675;font-weight:600;}
+  .guard .x{color:var(--rose);font-weight:800;}
 
-  .canvas {
-    min-width: 540px;
-  }
+  /* privacy chips */
+  .privacy{margin:16px 0 6px;}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;}
+  .chip{display:inline-flex;align-items:center;gap:6px;font-size:.71rem;color:var(--teal-ink);background:var(--teal-soft);
+    border:1px solid var(--teal-line);border-radius:999px;padding:5px 12px;font-weight:600;}
+  .chip .ck{color:var(--teal);font-weight:800;}
 
-  /* ---------- generic card ---------- */
-  .card {
-    background: var(--card);
-    border: 1px solid var(--line);
-    border-radius: 12px;
-    box-shadow: var(--shadow);
-    padding: 10px 12px;
-  }
+  /* feeds arrow */
+  .feeds{display:flex;flex-direction:column;align-items:center;margin:14px 0 12px;color:var(--rose);}
+  .feeds .cap{font-size:.72rem;font-weight:700;margin-bottom:5px;letter-spacing:.01em;}
+  .feeds .stem{width:2px;height:16px;background:var(--rose-line);position:relative;}
+  .feeds .stem::after{content:"";position:absolute;bottom:-1px;left:50%;transform:translateX(-50%);
+    border-left:6px solid transparent;border-right:6px solid transparent;border-top:9px solid var(--rose-line);}
 
-  .section-label {
-    font-size: 0.68rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--sub);
-    margin: 0 0 8px;
-    text-align: center;
-  }
+  /* system of record */
+  .sor{background:var(--rose-soft);border:2px dashed var(--rose-line);border-radius:18px;padding:16px 16px 14px;box-shadow:var(--shadow);}
+  .sor .lbl{color:var(--rose);}
+  .sor .lbl::before,.sor .lbl::after{background:var(--rose-line);width:calc(50% - 108px);}
+  .sor-in{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  @media(max-width:480px){.sor-in{grid-template-columns:1fr;}}
+  .sor-card{background:#fff;border:1px solid var(--rose-line);border-radius:12px;padding:12px 13px;}
+  .sor-card .bdg{display:inline-block;font-size:.58rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;
+    color:#fff;background:var(--rose);border-radius:999px;padding:2px 9px;margin-bottom:7px;}
+  .sor-card h4{margin:0 0 3px;font-size:.84rem;color:var(--rose);}
+  .sor-card p{margin:0;font-size:.71rem;color:var(--sub);line-height:1.4;}
 
-  /* ---------- roles row ---------- */
-  .roles {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-    margin-bottom: 8px;
-  }
-
-  .role {
-    border-radius: 12px;
-    border: 1.5px solid var(--line);
-    box-shadow: var(--shadow);
-    padding: 10px 10px 11px;
-    text-align: center;
-  }
-
-  .role .tag {
-    display: inline-block;
-    font-size: 0.62rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    padding: 2px 7px;
-    border-radius: 999px;
-    margin-bottom: 5px;
-  }
-
-  .role h3 {
-    margin: 0 0 3px;
-    font-size: 0.88rem;
-  }
-
-  .role p {
-    margin: 0;
-    font-size: 0.72rem;
-    color: var(--sub);
-    line-height: 1.35;
-  }
-
-  .role.convener { background: var(--convener); border-color: var(--convener-line); }
-  .role.convener .tag { background: var(--convener-line); color: var(--convener-ink); }
-
-  .role.sender { background: var(--sender); border-color: var(--sender-line); }
-  .role.sender .tag { background: var(--sender-line); color: var(--sender-ink); }
-
-  .role.receiver { background: var(--receiver); border-color: var(--receiver-line); }
-  .role.receiver .tag { background: var(--receiver-line); color: var(--receiver-ink); }
-
-  /* connectors between roles and tool */
-  .role-arrows {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    height: 26px;
-    margin-bottom: 2px;
-  }
-  .role-arrows svg { width: 100%; height: 100%; display: block; overflow: visible; }
-
-  /* ---------- tool box ---------- */
-  .tool-box {
-    background: var(--teal-soft);
-    border: 1.5px solid var(--teal-line);
-    border-radius: 14px;
-    box-shadow: var(--shadow);
-    padding: 12px;
-    margin-bottom: 4px;
-  }
-
-  .tool-title {
-    text-align: center;
-    margin: 0 0 10px;
-  }
-
-  .tool-title strong {
-    color: var(--teal);
-    font-size: 0.95rem;
-    letter-spacing: -0.01em;
-  }
-
-  .tool-title span {
-    display: block;
-    font-size: 0.68rem;
-    color: var(--sub);
-    margin-top: 1px;
-  }
-
-  .components {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
-  }
-
-  @media (min-width: 620px) {
-    .components { grid-template-columns: repeat(4, 1fr); }
-  }
-
-  .comp {
-    background: #ffffff;
-    border: 1px solid var(--teal-line);
-    border-radius: 10px;
-    padding: 8px 8px 9px;
-    text-align: center;
-  }
-
-  .comp .icon {
-    font-size: 1.1rem;
-    line-height: 1;
-    margin-bottom: 4px;
-  }
-
-  .comp h4 {
-    margin: 0 0 3px;
-    font-size: 0.74rem;
-    color: var(--ink);
-  }
-
-  .comp p {
-    margin: 0;
-    font-size: 0.66rem;
-    color: var(--sub);
-    line-height: 1.3;
-  }
-
-  .comp.negative {
-    background: #fbfbfc;
-    border-style: dashed;
-    border-color: #c3cad4;
-  }
-  .comp.negative h4 { color: #6b7480; }
-
-  .no-icon { color: #b23b3b; }
-
-  /* flow arrow down from tool to sharing to receiver, plus to SoR */
-  .down-arrows {
-    display: flex;
-    justify-content: center;
-    margin: 2px 0 2px;
-  }
-  .down-arrows svg { overflow: visible; }
-
-  /* ---------- privacy strip ---------- */
-  .privacy {
-    background: #ffffff;
-    border: 1px dashed var(--teal-line);
-    border-radius: 12px;
-    padding: 8px 12px;
-    margin: 10px 0 14px;
-  }
-
-  .privacy .section-label { margin-bottom: 6px; }
-
-  .privacy ul {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px 10px;
-    justify-content: center;
-  }
-
-  .privacy li {
-    font-size: 0.68rem;
-    color: var(--teal-ink, #0e5f52);
-    background: var(--teal-soft);
-    border: 1px solid var(--teal-line);
-    border-radius: 999px;
-    padding: 3px 9px;
-    white-space: nowrap;
-  }
-
-  /* ---------- system of record boundary ---------- */
-  .sor {
-    background: var(--sor-bg);
-    border: 2px dashed var(--sor-line);
-    border-radius: 14px;
-    padding: 12px;
-    box-shadow: var(--shadow);
-  }
-
-  .sor .section-label { color: var(--sor-ink); }
-
-  .sor-inner {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    align-items: stretch;
-    justify-content: center;
-  }
-
-  .sor-card {
-    background: #ffffff;
-    border: 1px solid var(--sor-line);
-    border-radius: 10px;
-    padding: 9px 12px;
-    flex: 1 1 220px;
-    max-width: 320px;
-  }
-
-  .sor-card h4 {
-    margin: 0 0 4px;
-    font-size: 0.8rem;
-    color: var(--sor-ink);
-  }
-
-  .sor-card p {
-    margin: 0;
-    font-size: 0.7rem;
-    color: var(--sub);
-    line-height: 1.35;
-  }
-
-  .sor-badge {
-    display: inline-block;
-    font-size: 0.6rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: #ffffff;
-    background: var(--sor-ink);
-    border-radius: 999px;
-    padding: 2px 8px;
-    margin-bottom: 6px;
-  }
-
-  .feeds-caption {
-    text-align: center;
-    font-size: 0.68rem;
-    color: var(--sor-ink);
-    margin: 6px 0 0;
-    font-weight: 600;
-  }
-
-  footer.page {
-    text-align: center;
-    margin-top: 16px;
-    font-size: 0.68rem;
-    color: var(--sub);
-    line-height: 1.5;
-  }
-
-  footer.page strong {
-    color: var(--teal);
-  }
-
-  /* dark theme */
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-      --bg: #14181f;
-      --card: #1c222c;
-      --ink: #e7ebf2;
-      --sub: #9aa5b4;
-      --line: #2b3340;
-      --teal: #4fc0ac;
-      --teal-soft: #16302b;
-      --teal-line: #2e6459;
-
-      --sender: #2c2214;
-      --sender-line: #5c4620;
-      --sender-ink: #e3b268;
-
-      --convener: #17203a;
-      --convener-line: #33456f;
-      --convener-ink: #9db3ea;
-
-      --receiver: #23193a;
-      --receiver-line: #4b3670;
-      --receiver-ink: #c6a4f0;
-
-      --sor-bg: #301e1c;
-      --sor-line: #6e3a34;
-      --sor-ink: #e59a90;
-
-      --arrow: #7c8797;
-    }
-  }
-  :root[data-theme="dark"] {
-    --bg: #14181f;
-    --card: #1c222c;
-    --ink: #e7ebf2;
-    --sub: #9aa5b4;
-    --line: #2b3340;
-    --teal: #4fc0ac;
-    --teal-soft: #16302b;
-    --teal-line: #2e6459;
-
-    --sender: #2c2214;
-    --sender-line: #5c4620;
-    --sender-ink: #e3b268;
-
-    --convener: #17203a;
-    --convener-line: #33456f;
-    --convener-ink: #9db3ea;
-
-    --receiver: #23193a;
-    --receiver-line: #4b3670;
-    --receiver-ink: #c6a4f0;
-
-    --sor-bg: #301e1c;
-    --sor-line: #6e3a34;
-    --sor-ink: #e59a90;
-
-    --arrow: #7c8797;
-  }
+  .foot{text-align:center;margin-top:20px;font-size:.72rem;color:var(--faint);line-height:1.6;}
+  .foot b{color:var(--teal-ink);}
 </style>
-</head>
-<body>
 <div class="wrap">
-
-  <header class="page">
-    <h1><span class="accent">Warm Handoff</span> — Architecture</h1>
-    <p>Birmingham homelessness-services hackathon project</p>
-  </header>
-
-  <div class="scrollpane">
-    <div class="canvas">
-
-      <!-- ROLES -->
-      <div class="roles">
-        <div class="role convener">
-          <span class="tag">Convener</span>
-          <h3>One Roof / Host Foundation</h3>
-          <p>CoC lead. Owns the tool, maintains the service directory.</p>
-        </div>
-        <div class="role sender">
-          <span class="tag">Sender</span>
-          <h3>Frontline Responder</h3>
-          <p>ER, shelter intake, outreach, 211, police. Creates the handoff card.</p>
-        </div>
-        <div class="role receiver">
-          <span class="tag">Receiver</span>
-          <h3>Receiving Agency</h3>
-          <p>Reads the card to continue care. No account needed.</p>
-        </div>
-      </div>
-
-      <div class="role-arrows">
-        <svg viewBox="0 0 100 26" preserveAspectRatio="none">
-          <defs>
-            <marker id="arrowConvener" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto">
-              <path d="M0,0 L8,4 L0,8 Z" fill="var(--convener-line)"/>
-            </marker>
-          </defs>
-          <line x1="50" y1="0" x2="50" y2="20" stroke="var(--convener-line)" stroke-width="2" marker-end="url(#arrowConvener)"/>
-        </svg>
-        <svg viewBox="0 0 100 26" preserveAspectRatio="none">
-          <defs>
-            <marker id="arrowSender" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto">
-              <path d="M0,0 L8,4 L0,8 Z" fill="var(--sender-line)"/>
-            </marker>
-          </defs>
-          <line x1="50" y1="0" x2="50" y2="20" stroke="var(--sender-line)" stroke-width="2" marker-end="url(#arrowSender)"/>
-        </svg>
-        <svg viewBox="0 0 100 26" preserveAspectRatio="none">
-          <defs>
-            <marker id="arrowReceiverUp" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto">
-              <path d="M0,8 L8,4 L0,0 Z" fill="var(--receiver-line)"/>
-            </marker>
-          </defs>
-          <line x1="50" y1="20" x2="50" y2="0" stroke="var(--receiver-line)" stroke-width="2" marker-end="url(#arrowReceiverUp)"/>
-        </svg>
-      </div>
-
-      <!-- TOOL -->
-      <div class="tool-box">
-        <div class="tool-title">
-          <strong>Warm Handoff</strong>
-          <span>ephemeral, browser-based handoff card tool — no client database</span>
-        </div>
-
-        <div class="components">
-          <div class="comp">
-            <div class="icon">🖊️</div>
-            <h4>Card Generator</h4>
-            <p>Front-end web form. Sender fills it in; nothing saves server-side as they type.</p>
-          </div>
-
-          <div class="comp">
-            <div class="icon">📇</div>
-            <h4>Synthetic Service Directory</h4>
-            <p>Clearly-synthetic providers, "last verified" dates. Maintained by convener; production sources from One Roof / 211.</p>
-          </div>
-
-          <div class="comp">
-            <div class="icon">⏱️</div>
-            <h4>Card Instance</h4>
-            <p>In-memory only. Rendered, shared, then purged after use. Never written to a client database.</p>
-          </div>
-
-          <div class="comp">
-            <div class="icon">📤</div>
-            <h4>Sharing</h4>
-            <p>Printout or secure expiring link. Receiver needs no login, no account.</p>
-          </div>
-        </div>
-
-        <div class="components" style="margin-top:8px; grid-template-columns: repeat(2, 1fr);">
-          <div class="comp negative">
-            <div class="icon no-icon">🚫</div>
-            <h4>No Client Database</h4>
-            <p>Warm Handoff persists nothing about the client after the card is issued.</p>
-          </div>
-          <div class="comp negative">
-            <div class="icon no-icon">🚫</div>
-            <h4>No HMIS Write</h4>
-            <p>The tool never writes into HMIS. It is a bridge, not a data source.</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- PRIVACY STRIP -->
-      <div class="privacy">
-        <p class="section-label">Data Privacy Properties</p>
-        <ul>
-          <li>Minimum-necessary identity: first name + last initial + code</li>
-          <li>Consent obtained before sharing</li>
-          <li>No scoring or risk ranking</li>
-          <li>No biometrics</li>
-          <li>Human confirmation before issue</li>
-        </ul>
-      </div>
-
-      <!-- ARROW DOWN TO SoR -->
-      <div class="down-arrows">
-        <svg width="140" height="30" viewBox="0 0 140 30" overflow="visible">
-          <defs>
-            <marker id="arrowFeed" markerWidth="9" markerHeight="9" refX="4.5" refY="4.5" orient="auto">
-              <path d="M0,0 L9,4.5 L0,9 Z" fill="var(--sor-line)"/>
-            </marker>
-          </defs>
-          <line x1="70" y1="0" x2="70" y2="22" stroke="var(--sor-line)" stroke-width="2.5" stroke-dasharray="5 4" marker-end="url(#arrowFeed)"/>
-        </svg>
-      </div>
-
-      <!-- SYSTEM OF RECORD -->
-      <div class="sor">
-        <p class="section-label">System of Record Boundary</p>
-        <div class="sor-inner">
-          <div class="sor-card">
-            <span class="sor-badge">Authoritative</span>
-            <h4>One Roof / HMIS</h4>
-            <p>Remains the single system of record for client data and case history.</p>
-          </div>
-          <div class="sor-card">
-            <span class="sor-badge">Unchanged</span>
-            <h4>Coordinated Entry</h4>
-            <p>Warm Handoff feeds into it — it never replaces or bypasses the CE process.</p>
-          </div>
-        </div>
-        <p class="feeds-caption">Warm Handoff feeds One Roof / HMIS. It does not replace it.</p>
-      </div>
-
+  <div class="head">
+    <div class="brand">
+      <span class="mark"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12h11M11 7l5 5-5 5" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="19.5" cy="12" r="1.6" fill="#fff"/></svg></span>
+      <span class="name">Relay</span>
     </div>
+    <p class="kick">System Architecture</p>
+    <h1>A moment-of-contact handoff that feeds the system of record</h1>
+    <p>Birmingham · Challenge 4 · Homelessness Services Handoff</p>
   </div>
 
-  <footer class="page">
-    Synthetic demonstration. Feeds — does not replace — Coordinated Entry (<strong>One Roof</strong>).
-  </footer>
+  <div class="scroll"><div class="canvas">
 
+    <p class="lbl">Who uses it</p>
+    <div class="roles">
+      <div class="role convener">
+        <div class="ic">🗂️</div><span class="tag">Convener</span>
+        <h3>One Roof</h3>
+        <p>CoC lead. Owns the tool and keeps the service directory verified.</p>
+      </div>
+      <div class="role sender">
+        <div class="ic">🩺</div><span class="tag">Sender</span>
+        <h3>Frontline responder</h3>
+        <p>ER, shelter intake, outreach, 211, police. Creates the handoff.</p>
+      </div>
+      <div class="role receiver">
+        <div class="ic">🏠</div><span class="tag">Receiver</span>
+        <h3>Receiving agency</h3>
+        <p>Reads the card and continues care. No account needed.</p>
+      </div>
+    </div>
+
+    <div class="oneroof">
+      <div class="ic">🗂️</div>
+      <div><h4>One Roof's role</h4>
+      <p><b>Owns &amp; operates Relay</b> and grants responder logins &middot; <b>keeps the service directory verified</b> (with United Way 211) &middot; <b>remains the system of record</b> it feeds, running Coordinated Entry and HMIS.</p></div>
+    </div>
+
+    <div class="conn"><span class="l"></span>
+      <svg width="14" height="14" viewBox="0 0 14 14"><path d="M7 1v9M3.5 7L7 10.5 10.5 7" stroke="#8a94a2" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      they all touch <span class="l"></span></div>
+
+    <div class="tool">
+      <div class="tool-h"><div class="n">Relay</div><div class="s">ephemeral, browser-based handoff card &middot; no client database, no login for receivers</div></div>
+      <div class="comps">
+        <div class="comp"><div class="ic">🖊️</div><h4>Card generator</h4><p>Responder fills a short form. Nothing saves as they type.</p></div>
+        <div class="comp"><div class="ic">📇</div><h4>Synthetic directory</h4><p>Fictional providers, "last verified" dates. From One Roof / 211 in production.</p></div>
+        <div class="comp"><div class="ic">⏱️</div><h4>Card instance</h4><p>In-memory only. Rendered, shared, then purged after use.</p></div>
+        <div class="comp"><div class="ic">📤</div><h4>Sharing</h4><p>Printout or secure expiring link. Receiver needs no account.</p></div>
+      </div>
+      <div class="guards">
+        <span class="guard"><span class="x">✕</span> No client database</span>
+        <span class="guard"><span class="x">✕</span> No HMIS write</span>
+        <span class="guard"><span class="x">✕</span> No scoring or biometrics</span>
+      </div>
+    </div>
+
+    <div class="privacy">
+      <p class="lbl">Privacy by design</p>
+      <div class="chips">
+        <span class="chip"><span class="ck">✓</span> Minimum identity: first name + last initial + code</span>
+        <span class="chip"><span class="ck">✓</span> Consent before sharing</span>
+        <span class="chip"><span class="ck">✓</span> No ID, photo, or biometric</span>
+        <span class="chip"><span class="ck">✓</span> Human confirmation before issue</span>
+      </div>
+    </div>
+
+    <div class="feeds">
+      <span class="cap">Relay feeds &mdash; never replaces</span>
+      <span class="stem"></span>
+    </div>
+
+    <div class="sor">
+      <p class="lbl">System of record</p>
+      <div class="sor-in">
+        <div class="sor-card"><span class="bdg">Authoritative</span><h4>One Roof / HMIS</h4><p>Remains the single system of record for client data and case history.</p></div>
+        <div class="sor-card"><span class="bdg">Unchanged</span><h4>Coordinated Entry</h4><p>Relay feeds into it. It never replaces or bypasses the CE process.</p></div>
+      </div>
+    </div>
+
+  </div></div>
+
+  <p class="foot">Synthetic demonstration. Relay <b>feeds</b>, and does not replace, Coordinated Entry (One Roof). This tool assists; a trained person decides.</p>
 </div>
-</body>
-</html>
