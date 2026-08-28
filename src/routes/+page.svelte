@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
+
 	type Category = {
 		name: string;
 		description: string;
@@ -79,10 +81,10 @@
 </script>
 
 <svelte:head>
-	<title>Bridge — First Responder Services Finder</title>
+	<title>CareGrid — First Responder Services Finder</title>
 	<meta
 		name="description"
-		content="Bridge helps first responders connect people experiencing homelessness to shelter, food, medical, and crisis services in real time."
+		content="CareGrid helps first responders connect people experiencing homelessness to shelter, food, medical, and crisis services in real time."
 	/>
 </svelte:head>
 
@@ -104,13 +106,14 @@
 						/>
 					</svg>
 				</span>
-				<span class="text-lg font-bold tracking-tight text-brand-950">Bridge</span>
+				<span class="text-lg font-bold tracking-tight text-brand-950">CareGrid</span>
 			</a>
 
 			<div class="hidden items-center gap-6 text-sm font-medium text-brand-700 md:flex">
 				<a href="#services" class="transition hover:text-brand-950">Services</a>
 				<a href="#how-it-works" class="transition hover:text-brand-950">How it works</a>
 				<a href="#hotlines" class="transition hover:text-brand-950">Hotlines</a>
+				<a href={resolve('/handoff')} class="transition hover:text-brand-950">Handoff Card</a>
 			</div>
 
 			<div class="flex items-center gap-2">
@@ -153,7 +156,7 @@
 					Connect someone to help — right where you're standing.
 				</h1>
 				<p class="mt-5 text-lg leading-relaxed text-brand-100">
-					Bridge gives first responders real-time access to shelter, food, medical, and crisis
+					CareGrid gives first responders real-time access to shelter, food, medical, and crisis
 					services near an encounter, so no one has to wait for a callback to get help.
 				</p>
 				<div class="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -385,13 +388,13 @@
 	<section class="bg-brand-950">
 		<div class="mx-auto max-w-7xl px-4 py-16 text-center sm:px-6 lg:px-8">
 			<h2 class="text-2xl font-extrabold text-white sm:text-3xl">
-				Bridge is built with outreach teams, not instead of them.
+				CareGrid is built with outreach teams, not instead of them.
 			</h2>
 			<p class="mx-auto mt-3 max-w-xl text-brand-100">
 				Every referral routes to a real case worker who follows up within 24 hours.
 			</p>
 			<a
-				href="#services"
+				href={resolve('/handoff')}
 				class="mt-8 inline-flex items-center justify-center rounded-lg bg-signal-500 px-6 py-3.5 text-base font-bold text-white shadow-lg shadow-signal-900/30 transition hover:bg-signal-600"
 			>
 				Start a Referral
@@ -417,14 +420,14 @@
 							/>
 						</svg>
 					</span>
-					<span class="text-base font-bold text-brand-950">Bridge</span>
+					<span class="text-base font-bold text-brand-950">CareGrid</span>
 				</div>
 				<p class="text-sm text-brand-700">
 					In a life-threatening emergency, always call <span class="font-semibold text-brand-950">911</span> first.
 				</p>
 			</div>
 			<p class="mt-6 text-xs text-brand-400">
-				&copy; 2026 Bridge Response Network. Built for first responders and outreach teams.
+				&copy; 2026 CareGrid Response Network. Built for first responders and outreach teams.
 			</p>
 		</div>
 	</footer>

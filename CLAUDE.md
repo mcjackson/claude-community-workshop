@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-A SvelteKit + Tailwind CSS app called "Bridge": a service finder that helps first responders connect
+A SvelteKit + Tailwind CSS app called "CareGrid": a service finder that helps first responders connect
 people experiencing homelessness to shelter, food, medical, mental health, and other services in real
 time. `src/routes/+page.svelte` is the front page; category cards there are UI placeholders — no
 backend or data layer exists yet.
@@ -56,4 +56,23 @@ primary correctness gate, and Playwright e2e specs (`*.e2e.ts`, e.g.
 
 ### Synthetic Data
 
+`docs/homelessness-handoff-scenarios.csv` is the source of example scenarios for this app — every row
+is fictional (`is_synthetic=true`) and represents no real person. Columns: `scenario_id`,
+`person_context`, `immediate_need`, `public_resource_type`, `information_to_confirm`, `safe_next_step`,
+`handoff_owner_type`, `follow_up_window`, `capacity_is_not_live`, `is_synthetic`.
+
+- `person_context` and `immediate_need` describe a fictional situation, not a real client — keep any
+  new rows written the same way (e.g. "Fictional adult ...").
+- `capacity_is_not_live` is always `true`: scenario data must never be presented as real-time shelter
+  or service availability (see Restrictions above).
+- `safe_next_step` always routes to a human confirmation point (calling ahead, Coordinated Entry,
+  a case manager) rather than an automated placement — new scenarios should follow this pattern.
+- When adding scenarios or sample/seed data anywhere in the app, extend this file (or a file shaped
+  like it) rather than inventing ad hoc examples elsewhere, and set `is_synthetic=true`.
+
+`npm run db:build` (`scripts/build-db.mjs`) mirrors this CSV into a SQLite database at
+`data/caregrid.sqlite` (gitignored, generated — not committed) using Node's built-in `node:sqlite`, no
+added dependency. The `HandoffScenarios` table's `is_synthetic` column has a `CHECK (is_synthetic = 1)`
+constraint, so the table structurally cannot hold non-synthetic rows. Re-run the script after editing
+the CSV; there is no separate migration path yet.
 
