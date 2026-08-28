@@ -1,6 +1,7 @@
-// Builds a SQLite database from the synthetic handoff scenarios CSV.
-// The CSV (docs/homelessness-handoff-scenarios.csv) is the source of truth —
-// this script only mirrors it into a queryable form. Re-run after editing the CSV.
+// Builds a SQLite database from the synthetic handoff scenarios and directory CSVs.
+// The CSVs (docs/homelessness-handoff-scenarios.csv, docs/homelessness-handoff-directory.csv)
+// are the source of truth — this script only mirrors them into a queryable form.
+// Re-run after editing either CSV.
 
 import { DatabaseSync } from 'node:sqlite';
 import { readFileSync, mkdirSync } from 'node:fs';
@@ -9,6 +10,7 @@ import path from 'node:path';
 
 const rootDir = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const csvPath = path.join(rootDir, 'docs', 'homelessness-handoff-scenarios.csv');
+const directoryCsvPath = path.join(rootDir, 'docs', 'homelessness-handoff-directory.csv');
 const dbPath = path.join(rootDir, 'data', 'caregrid.sqlite');
 
 function parseCsv(text) {
@@ -21,6 +23,7 @@ function parseCsv(text) {
 }
 
 const rows = parseCsv(readFileSync(csvPath, 'utf-8'));
+const directoryRows = parseCsv(readFileSync(directoryCsvPath, 'utf-8'));
 
 mkdirSync(path.dirname(dbPath), { recursive: true });
 const db = new DatabaseSync(dbPath);
@@ -37,6 +40,20 @@ db.exec(`
 		handoff_owner_type TEXT NOT NULL,
 		follow_up_window TEXT NOT NULL,
 		capacity_is_not_live INTEGER NOT NULL CHECK (capacity_is_not_live IN (0, 1)),
+		is_synthetic INTEGER NOT NULL CHECK (is_synthetic = 1)
+	);
+
+	DROP TABLE IF EXISTS ServiceDirectory;
+	CREATE TABLE ServiceDirectory (
+		service_id TEXT PRIMARY KEY,
+		name TEXT NOT NULL,
+		public_resource_type TEXT NOT NULL,
+		serves TEXT NOT NULL,
+		accommodations TEXT NOT NULL,
+		area TEXT NOT NULL,
+		contact TEXT NOT NULL,
+		last_verified TEXT NOT NULL,
+		capacity_is_not_live INTEGER NOT NULL CHECK (capacity_is_not_live = 1),
 		is_synthetic INTEGER NOT NULL CHECK (is_synthetic = 1)
 	);
 `);
@@ -64,6 +81,28 @@ for (const row of rows) {
 	);
 }
 
+const insertDirectory = db.prepare(`
+	INSERT INTO ServiceDirectory (
+		service_id, name, public_resource_type, serves, accommodations,
+		area, contact, last_verified, capacity_is_not_live, is_synthetic
+	) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+`);
+
+for (const row of directoryRows) {
+	insertDirectory.run(
+		row.service_id,
+		row.name,
+		row.public_resource_type,
+		row.serves,
+		row.accommodations,
+		row.area,
+		row.contact,
+		row.last_verified,
+		row.capacity_is_not_live === 'true' ? 1 : 0,
+		row.is_synthetic === 'true' ? 1 : 0
+	);
+}
+
 db.close();
 
-console.log(`Wrote ${rows.length} synthetic scenarios to ${path.relative(rootDir, dbPath)}`);
+console.log(`Wrote ${rows.length} synthetic scenarios and ${directoryRows.length} synthetic directory entries to ${path.relative(rootDir, dbPath)}`);

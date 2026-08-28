@@ -1,4 +1,4 @@
-// Data model for the first-responder handoff card.
+// Data model for the first-responder relay card.
 //
 // This intentionally excludes fields that would identify the person being
 // referred (legal name, DOB, SSN, HMIS ID, etc.) — see "Application Rules"
@@ -17,9 +17,9 @@ export type ServiceCategory =
 	| 'id'
 	| 'case';
 
-export type HandoffTiming = 'tonight' | 'this-week' | 'flexible';
+export type RelayTiming = 'tonight' | 'this-week' | 'flexible';
 
-export interface HandoffCard {
+export interface RelayCard {
 	responderName: string;
 	responderAgency: string;
 	responderContact: string;
@@ -27,13 +27,13 @@ export interface HandoffCard {
 	encounterDateTime: string;
 	preferredName: string;
 	categories: ServiceCategory[];
-	timing: HandoffTiming;
+	timing: RelayTiming;
 	notes: string;
 	consentConfirmed: boolean;
 	humanConfirmed: boolean;
 }
 
-export function createEmptyHandoffCard(): HandoffCard {
+export function createEmptyRelayCard(): RelayCard {
 	return {
 		responderName: '',
 		responderAgency: '',

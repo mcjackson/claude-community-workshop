@@ -6,8 +6,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 A SvelteKit + Tailwind CSS app called "CareGrid": a service finder that helps first responders connect
 people experiencing homelessness to shelter, food, medical, mental health, and other services in real
-time. `src/routes/+page.svelte` is the front page; category cards there are UI placeholders — no
-backend or data layer exists yet.
+time. `src/routes/+page.svelte` is the front page; the category cards there are still UI placeholders,
+but the "Full directory" section below them is real: `src/routes/+page.server.ts` loads the
+`ServiceDirectory` table from `data/caregrid.sqlite` at request time.
 
 ## Commands
 
@@ -70,9 +71,14 @@ is fictional (`is_synthetic=true`) and represents no real person. Columns: `scen
 - When adding scenarios or sample/seed data anywhere in the app, extend this file (or a file shaped
   like it) rather than inventing ad hoc examples elsewhere, and set `is_synthetic=true`.
 
-`npm run db:build` (`scripts/build-db.mjs`) mirrors this CSV into a SQLite database at
-`data/caregrid.sqlite` (gitignored, generated — not committed) using Node's built-in `node:sqlite`, no
-added dependency. The `HandoffScenarios` table's `is_synthetic` column has a `CHECK (is_synthetic = 1)`
-constraint, so the table structurally cannot hold non-synthetic rows. Re-run the script after editing
-the CSV; there is no separate migration path yet.
+`npm run db:build` (`scripts/build-db.mjs`) mirrors this CSV, and `docs/homelessness-handoff-directory.csv`
+(the `ServiceDirectory` table), into a SQLite database at `data/caregrid.sqlite` (gitignored,
+generated — not committed) using Node's built-in `node:sqlite`. Both tables' `is_synthetic` columns
+have a `CHECK (is_synthetic = 1)` constraint, so they structurally cannot hold non-synthetic rows.
+Re-run the script after editing either CSV; there is no separate migration path yet.
+
+**`data/caregrid.sqlite` must exist before `dev`/`build`/`preview` run** — `src/routes/+page.server.ts`
+reads `ServiceDirectory` from it at request time via `node:sqlite` (hence the `@types/node` dev
+dependency). Run `npm run db:build` first if the file is missing. This also means the root route is
+server-rendered per-request, not static/prerenderable.
 

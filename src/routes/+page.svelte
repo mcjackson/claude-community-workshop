@@ -1,11 +1,31 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
+	import type { PageData } from './$types';
+
+	let { data }: { data: PageData } = $props();
+
+	type IconName = 'shelter' | 'food' | 'medical' | 'crisis' | 'substance' | 'weather' | 'id' | 'case';
 
 	type Category = {
 		name: string;
 		description: string;
-		icon: 'shelter' | 'food' | 'medical' | 'crisis' | 'substance' | 'weather' | 'id' | 'case';
+		icon: IconName;
 	};
+
+	// Maps ServiceDirectory.public_resource_type (docs/homelessness-handoff-directory.csv)
+	// onto the same icon set used for the categories above.
+	const directoryIcons: Record<string, IconName> = {
+		'medical respite': 'medical',
+		'family shelter': 'shelter',
+		'pet-friendly shelter bed': 'shelter',
+		'cooling center': 'weather',
+		'youth transitional housing': 'case',
+		'daytime drop-in center': 'id'
+	};
+
+	function directoryIcon(type: string): IconName {
+		return directoryIcons[type] ?? 'case';
+	}
 
 	const categories: Category[] = [
 		{
@@ -89,57 +109,6 @@
 </svelte:head>
 
 <div class="min-h-screen bg-white font-sans text-brand-950 antialiased">
-	<!-- Header -->
-	<header class="sticky top-0 z-50 border-b border-brand-100 bg-white/95 backdrop-blur">
-		<div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
-			<a href="/" class="flex items-center gap-2.5">
-				<span
-					class="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-700 text-white"
-					aria-hidden="true"
-				>
-					<svg viewBox="0 0 24 24" fill="none" class="h-5 w-5">
-						<path
-							d="M3 21V10L12 3L21 10V21H14V15H10V21H3Z"
-							stroke="currentColor"
-							stroke-width="1.8"
-							stroke-linejoin="round"
-						/>
-					</svg>
-				</span>
-				<span class="text-lg font-bold tracking-tight text-brand-950">CareGrid</span>
-			</a>
-
-			<div class="hidden items-center gap-6 text-sm font-medium text-brand-700 md:flex">
-				<a href="#services" class="transition hover:text-brand-950">Services</a>
-				<a href="#how-it-works" class="transition hover:text-brand-950">How it works</a>
-				<a href="#hotlines" class="transition hover:text-brand-950">Hotlines</a>
-				<a href={resolve('/handoff')} class="transition hover:text-brand-950">Handoff Card</a>
-			</div>
-
-			<div class="flex items-center gap-2">
-				<span
-					class="hidden rounded-full bg-brand-50 px-3 py-1 text-xs font-semibold text-brand-700 sm:inline-block"
-				>
-					For First Responders
-				</span>
-				<a
-					href="tel:911"
-					class="inline-flex items-center gap-1.5 rounded-lg bg-signal-500 px-3.5 py-2 text-sm font-bold text-white shadow-sm transition hover:bg-signal-600"
-				>
-					<svg viewBox="0 0 24 24" fill="none" class="h-4 w-4">
-						<path
-							d="M4 5C4 4.44772 4.44772 4 5 4H8.5L10 8.5L7.8 10.2C8.7 12.2 10.3 13.8 12.3 14.7L14 12.5L18.5 14V17.5C18.5 18.0523 18.0523 18.5 17.5 18.5C10.0442 18.5 4 12.4558 4 5Z"
-							stroke="currentColor"
-							stroke-width="1.7"
-							stroke-linejoin="round"
-						/>
-					</svg>
-					911
-				</a>
-			</div>
-		</div>
-	</header>
-
 	<!-- Hero -->
 	<section class="relative overflow-hidden bg-brand-950">
 		<div
@@ -161,18 +130,24 @@
 				</p>
 				<div class="mt-8 flex flex-col gap-3 sm:flex-row">
 					<a
-						href="#services"
+						href={resolve('/relay-card')}
 						class="inline-flex items-center justify-center rounded-lg bg-signal-500 px-6 py-3.5 text-base font-bold text-white shadow-lg shadow-signal-900/30 transition hover:bg-signal-600"
+					>
+						Start a Relay Card
+					</a>
+					<a
+						href="#services"
+						class="inline-flex items-center justify-center rounded-lg border border-white/20 bg-white/5 px-6 py-3.5 text-base font-semibold text-white transition hover:bg-white/10"
 					>
 						Find Services Near Me
 					</a>
-					<a
-						href="#how-it-works"
-						class="inline-flex items-center justify-center rounded-lg border border-white/20 bg-white/5 px-6 py-3.5 text-base font-semibold text-white transition hover:bg-white/10"
-					>
-						How it works
-					</a>
 				</div>
+				<a
+					href="#how-it-works"
+					class="mt-4 inline-block text-sm font-medium text-brand-200 underline-offset-4 hover:text-white hover:underline"
+				>
+					See how it works
+				</a>
 			</div>
 		</div>
 
@@ -188,6 +163,102 @@
 			</dl>
 		</div>
 	</section>
+
+	{#snippet categoryIcon(name: IconName)}
+		<svg viewBox="0 0 24 24" fill="none" class="h-5.5 w-5.5">
+			{#if name === 'shelter'}
+				<path
+					d="M3 21V10L12 3L21 10V21H14V15H10V21H3Z"
+					stroke="currentColor"
+					stroke-width="1.7"
+					stroke-linejoin="round"
+				/>
+			{:else if name === 'food'}
+				<path
+					d="M6 3V10.5M9 3V10.5M6 10.5C6 12 7.2 13 9 13V21M9 3C7 3 6 5 6 7.5C6 9 6.8 10.5 9 10.5"
+					stroke="currentColor"
+					stroke-width="1.7"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+				/>
+				<path
+					d="M16 3C14 3 13.5 6 13.5 9C13.5 11 14.5 12 16 12V21"
+					stroke="currentColor"
+					stroke-width="1.7"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+				/>
+			{:else if name === 'medical'}
+				<path
+					d="M12 21C12 21 4 15.5 4 9.8C4 6.6 6.4 4.5 9 4.5C10.5 4.5 11.5 5.2 12 6.1C12.5 5.2 13.5 4.5 15 4.5C17.6 4.5 20 6.6 20 9.8C20 15.5 12 21 12 21Z"
+					stroke="currentColor"
+					stroke-width="1.7"
+					stroke-linejoin="round"
+				/>
+				<path
+					d="M9.5 11H11.2L12 9L13 13L13.8 11H15.5"
+					stroke="currentColor"
+					stroke-width="1.5"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+				/>
+			{:else if name === 'crisis'}
+				<path
+					d="M4 12C4 7.6 7.6 4 12 4C16.4 4 20 7.6 20 12C20 16 17 19 13 19.8V22L9.5 19.6C6.3 18.6 4 15.6 4 12Z"
+					stroke="currentColor"
+					stroke-width="1.7"
+					stroke-linejoin="round"
+				/>
+				<path
+					d="M9 12H9.01M12 12H12.01M15 12H15.01"
+					stroke="currentColor"
+					stroke-width="2"
+					stroke-linecap="round"
+				/>
+			{:else if name === 'substance'}
+				<path
+					d="M10 3H14M11 3V8.5L6.5 17C5.8 18.3 6.7 20 8.2 20H15.8C17.3 20 18.2 18.3 17.5 17L13 8.5V3"
+					stroke="currentColor"
+					stroke-width="1.7"
+					stroke-linejoin="round"
+				/>
+				<path d="M8 15H16" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
+			{:else if name === 'weather'}
+				<path
+					d="M12 3V5M12 19V21M4.2 4.2L5.6 5.6M18.4 18.4L19.8 19.8M3 12H5M19 12H21M4.2 19.8L5.6 18.4M18.4 5.6L19.8 4.2"
+					stroke="currentColor"
+					stroke-width="1.7"
+					stroke-linecap="round"
+				/>
+				<circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.7" />
+			{:else if name === 'id'}
+				<rect x="3.5" y="5.5" width="17" height="13" rx="1.8" stroke="currentColor" stroke-width="1.7" />
+				<circle cx="9" cy="11" r="1.8" stroke="currentColor" stroke-width="1.5" />
+				<path
+					d="M6.5 15.5C6.5 14 7.6 13.3 9 13.3C10.4 13.3 11.5 14 11.5 15.5"
+					stroke="currentColor"
+					stroke-width="1.5"
+					stroke-linecap="round"
+				/>
+				<path d="M14 9.5H17.5M14 12.5H17.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+			{:else if name === 'case'}
+				<circle cx="9" cy="8" r="2.5" stroke="currentColor" stroke-width="1.7" />
+				<path
+					d="M4 19C4 15.7 6.3 14 9 14C11.7 14 14 15.7 14 19"
+					stroke="currentColor"
+					stroke-width="1.7"
+					stroke-linecap="round"
+				/>
+				<circle cx="17" cy="9" r="2" stroke="currentColor" stroke-width="1.5" />
+				<path
+					d="M14.5 19C14.5 16.3 15.9 15 18 15C19.9 15 21 16.1 21 18.3"
+					stroke="currentColor"
+					stroke-width="1.5"
+					stroke-linecap="round"
+				/>
+			{/if}
+		</svg>
+	{/snippet}
 
 	<!-- Service categories -->
 	<section id="services" class="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
@@ -212,107 +283,7 @@
 						class="flex h-11 w-11 items-center justify-center rounded-lg bg-brand-50 text-brand-700 transition group-hover:bg-brand-700 group-hover:text-white"
 						aria-hidden="true"
 					>
-						<svg viewBox="0 0 24 24" fill="none" class="h-5.5 w-5.5">
-							{#if category.icon === 'shelter'}
-								<path
-									d="M3 21V10L12 3L21 10V21H14V15H10V21H3Z"
-									stroke="currentColor"
-									stroke-width="1.7"
-									stroke-linejoin="round"
-								/>
-							{:else if category.icon === 'food'}
-								<path
-									d="M6 3V10.5M9 3V10.5M6 10.5C6 12 7.2 13 9 13V21M9 3C7 3 6 5 6 7.5C6 9 6.8 10.5 9 10.5"
-									stroke="currentColor"
-									stroke-width="1.7"
-									stroke-linecap="round"
-									stroke-linejoin="round"
-								/>
-								<path
-									d="M16 3C14 3 13.5 6 13.5 9C13.5 11 14.5 12 16 12V21"
-									stroke="currentColor"
-									stroke-width="1.7"
-									stroke-linecap="round"
-									stroke-linejoin="round"
-								/>
-							{:else if category.icon === 'medical'}
-								<path
-									d="M12 21C12 21 4 15.5 4 9.8C4 6.6 6.4 4.5 9 4.5C10.5 4.5 11.5 5.2 12 6.1C12.5 5.2 13.5 4.5 15 4.5C17.6 4.5 20 6.6 20 9.8C20 15.5 12 21 12 21Z"
-									stroke="currentColor"
-									stroke-width="1.7"
-									stroke-linejoin="round"
-								/>
-								<path
-									d="M9.5 11H11.2L12 9L13 13L13.8 11H15.5"
-									stroke="currentColor"
-									stroke-width="1.5"
-									stroke-linecap="round"
-									stroke-linejoin="round"
-								/>
-							{:else if category.icon === 'crisis'}
-								<path
-									d="M4 12C4 7.6 7.6 4 12 4C16.4 4 20 7.6 20 12C20 16 17 19 13 19.8V22L9.5 19.6C6.3 18.6 4 15.6 4 12Z"
-									stroke="currentColor"
-									stroke-width="1.7"
-									stroke-linejoin="round"
-								/>
-								<path
-									d="M9 12H9.01M12 12H12.01M15 12H15.01"
-									stroke="currentColor"
-									stroke-width="2"
-									stroke-linecap="round"
-								/>
-							{:else if category.icon === 'substance'}
-								<path
-									d="M10 3H14M11 3V8.5L6.5 17C5.8 18.3 6.7 20 8.2 20H15.8C17.3 20 18.2 18.3 17.5 17L13 8.5V3"
-									stroke="currentColor"
-									stroke-width="1.7"
-									stroke-linejoin="round"
-								/>
-								<path d="M8 15H16" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
-							{:else if category.icon === 'weather'}
-								<path
-									d="M12 3V5M12 19V21M4.2 4.2L5.6 5.6M18.4 18.4L19.8 19.8M3 12H5M19 12H21M4.2 19.8L5.6 18.4M18.4 5.6L19.8 4.2"
-									stroke="currentColor"
-									stroke-width="1.7"
-									stroke-linecap="round"
-								/>
-								<circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.7" />
-							{:else if category.icon === 'id'}
-								<rect
-									x="3.5"
-									y="5.5"
-									width="17"
-									height="13"
-									rx="1.8"
-									stroke="currentColor"
-									stroke-width="1.7"
-								/>
-								<circle cx="9" cy="11" r="1.8" stroke="currentColor" stroke-width="1.5" />
-								<path
-									d="M6.5 15.5C6.5 14 7.6 13.3 9 13.3C10.4 13.3 11.5 14 11.5 15.5"
-									stroke="currentColor"
-									stroke-width="1.5"
-									stroke-linecap="round"
-								/>
-								<path d="M14 9.5H17.5M14 12.5H17.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
-							{:else if category.icon === 'case'}
-								<circle cx="9" cy="8" r="2.5" stroke="currentColor" stroke-width="1.7" />
-								<path
-									d="M4 19C4 15.7 6.3 14 9 14C11.7 14 14 15.7 14 19"
-									stroke="currentColor"
-									stroke-width="1.7"
-									stroke-linecap="round"
-								/>
-								<circle cx="17" cy="9" r="2" stroke="currentColor" stroke-width="1.5" />
-								<path
-									d="M14.5 19C14.5 16.3 15.9 15 18 15C19.9 15 21 16.1 21 18.3"
-									stroke="currentColor"
-									stroke-width="1.5"
-									stroke-linecap="round"
-								/>
-							{/if}
-						</svg>
+						{@render categoryIcon(category.icon)}
 					</span>
 					<h3 class="mt-4 text-base font-bold text-brand-950">{category.name}</h3>
 					<p class="mt-1.5 text-sm leading-relaxed text-brand-700">{category.description}</p>
@@ -331,6 +302,55 @@
 						</svg>
 					</span>
 				</button>
+			{/each}
+		</div>
+	</section>
+
+	<!-- Service directory -->
+	<section id="directory" class="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
+		<div class="max-w-2xl">
+			<h2 class="text-sm font-bold tracking-wide text-brand-600 uppercase">Full directory</h2>
+			<p class="mt-2 text-3xl font-extrabold tracking-tight text-brand-950 sm:text-4xl">
+				Every site behind the categories above.
+			</p>
+			<p class="mt-3 text-base text-brand-700">
+				Synthetic partner directory for this demo. Capacity isn't live — confirm by phone before
+				sending anyone.
+			</p>
+		</div>
+
+		<div class="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+			{#each data.services as service (service.id)}
+				<a
+					href={`tel:${service.contact.replace(/[^0-9+]/g, '')}`}
+					class="group flex flex-col rounded-xl border border-brand-100 bg-white p-5 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-brand-300 hover:shadow-md"
+				>
+					<span
+						class="flex h-11 w-11 items-center justify-center rounded-lg bg-brand-50 text-brand-700 transition group-hover:bg-brand-700 group-hover:text-white"
+						aria-hidden="true"
+					>
+						{@render categoryIcon(directoryIcon(service.type))}
+					</span>
+					<h3 class="mt-4 text-base font-bold text-brand-950">{service.name}</h3>
+					<p class="mt-1.5 text-sm leading-relaxed text-brand-700">{service.serves} · {service.area}</p>
+					<p class="mt-1 text-xs text-brand-400">
+						✓ Last verified {service.lastVerified} · capacity not live, confirm by phone
+					</p>
+					<span
+						class="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-brand-600 group-hover:text-signal-600"
+					>
+						Call {service.contact}
+						<svg viewBox="0 0 24 24" fill="none" class="h-4 w-4 transition group-hover:translate-x-0.5">
+							<path
+								d="M5 12H19M19 12L13 6M19 12L13 18"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							/>
+						</svg>
+					</span>
+				</a>
 			{/each}
 		</div>
 	</section>
@@ -394,10 +414,10 @@
 				Every referral routes to a real case worker who follows up within 24 hours.
 			</p>
 			<a
-				href={resolve('/handoff')}
+				href={resolve('/relay-card')}
 				class="mt-8 inline-flex items-center justify-center rounded-lg bg-signal-500 px-6 py-3.5 text-base font-bold text-white shadow-lg shadow-signal-900/30 transition hover:bg-signal-600"
 			>
-				Start a Referral
+				Start a Relay Card
 			</a>
 		</div>
 	</section>
