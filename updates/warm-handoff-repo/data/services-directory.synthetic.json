@@ -1,0 +1,18 @@
+{
+  "_notice": "SYNTHETIC / ILLUSTRATIVE DIRECTORY. Fictional providers mapped to real Birmingham service categories. Not real organizations, not live capacity. capacity_is_not_live = true for every entry. In production this directory is sourced from and maintained by One Roof / United Way 211.",
+  "is_synthetic": true,
+  "capacity_is_not_live": true,
+  "last_reviewed": "2026-08-28",
+  "entries": [
+    {"id":"SVC-01","name":"Southside Medical Respite","type":"Medical respite","serves":"Adults recently discharged from hospital","accommodations":["wheelchair accessible"],"referral_form_required":true,"area":"Southside","contact":"(205) 555-0142","last_verified":"2026-08-27"},
+    {"id":"SVC-02","name":"Cahaba Recovery Respite","type":"Medical respite","serves":"Adults needing short-term recovery beds","accommodations":[],"referral_form_required":true,"area":"Woodlawn","contact":"(205) 555-0177","last_verified":"2026-08-26"},
+    {"id":"SVC-03","name":"Magic City Family Haven","type":"Family shelter","serves":"Families with children","accommodations":["cribs available"],"referral_form_required":false,"area":"Downtown","contact":"(205) 555-0110","last_verified":"2026-08-27"},
+    {"id":"SVC-04","name":"East Lake Family Shelter","type":"Family shelter","serves":"Families with children; DV-safe intake","accommodations":["DV-safe","children"],"referral_form_required":false,"area":"East Lake","contact":"(205) 555-0198","last_verified":"2026-08-25"},
+    {"id":"SVC-05","name":"Red Mountain Shelter","type":"Pet-friendly shelter bed","serves":"Adults with pets","accommodations":["on-site kennels"],"referral_form_required":false,"area":"Southtown","contact":"(205) 555-0163","last_verified":"2026-08-27"},
+    {"id":"SVC-06","name":"Downtown Cooling Center","type":"Cooling center","serves":"Anyone, daytime hours","accommodations":["water","AC"],"referral_form_required":false,"area":"City Center","contact":"(205) 555-0120","last_verified":"2026-08-28"},
+    {"id":"SVC-07","name":"Norwood Cooling Site","type":"Cooling center","serves":"Anyone, daytime hours","accommodations":["water"],"referral_form_required":false,"area":"Norwood","contact":"(205) 555-0134","last_verified":"2026-08-28"},
+    {"id":"SVC-08","name":"Vulcan Youth Transitions","type":"Youth transitional housing","serves":"Young adults ages 18-24","accommodations":["ID assistance"],"referral_form_required":false,"area":"Five Points","contact":"(205) 555-0155","last_verified":"2026-08-24"},
+    {"id":"SVC-09","name":"First Light Day Center","type":"Daytime drop-in center","serves":"Adults","accommodations":["showers","charging","phones"],"referral_form_required":false,"area":"Downtown","contact":"(205) 555-0188","last_verified":"2026-08-27"},
+    {"id":"SVC-10","name":"Common Ground Drop-In","type":"Daytime drop-in center","serves":"Adults","accommodations":["mail","charging"],"referral_form_required":false,"area":"Avondale","contact":"(205) 555-0171","last_verified":"2026-08-26"}
+  ]
+}

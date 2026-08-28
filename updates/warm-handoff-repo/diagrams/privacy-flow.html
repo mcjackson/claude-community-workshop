@@ -1,0 +1,123 @@
+<title>Warm Handoff Privacy Flow</title>
+<style>
+  :root {
+    --bg:#f7f6f3; --card:#ffffff; --ink:#1c1c1a; --muted:#5f5c55; --line:#c9c4ba;
+    --accent:#2f6b5e; --accent-soft:#e3efeb; --warn:#9a5b1e; --warn-soft:#f6ebdd;
+    --human:#3a4a7a; --human-soft:#e6e9f4; --priv:#6d4a86; --priv-soft:#efe7f5;
+    --shadow:0 1px 3px rgba(0,0,0,.08), 0 6px 18px rgba(0,0,0,.05);
+  }
+  :root:not([data-theme="light"]) { @media (prefers-color-scheme: dark) {
+    --bg:#16171a; --card:#212327; --ink:#eceae4; --muted:#a3a09a; --line:#3a3d43;
+    --accent:#6fb9a6; --accent-soft:#20302c; --warn:#e0a866; --warn-soft:#332a1e;
+    --human:#9fb0e0; --human-soft:#232838; --priv:#c3a3dc; --priv-soft:#2b2334;
+    --shadow:0 1px 3px rgba(0,0,0,.4), 0 6px 20px rgba(0,0,0,.35);
+  }}
+  :root[data-theme="dark"] {
+    --bg:#16171a; --card:#212327; --ink:#eceae4; --muted:#a3a09a; --line:#3a3d43;
+    --accent:#6fb9a6; --accent-soft:#20302c; --warn:#e0a866; --warn-soft:#332a1e;
+    --human:#9fb0e0; --human-soft:#232838; --priv:#c3a3dc; --priv-soft:#2b2334;
+    --shadow:0 1px 3px rgba(0,0,0,.4), 0 6px 20px rgba(0,0,0,.35);
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); padding:32px 20px 48px;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; line-height:1.5; }
+  .wrap { max-width:760px; margin:0 auto; }
+  h1 { font-size:1.5rem; margin:0 0 4px; letter-spacing:-.01em; }
+  .sub { color:var(--muted); font-size:.95rem; margin:0 0 24px; }
+  .lane { font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em;
+    color:var(--muted); margin:18px 0 8px; }
+  .step { background:var(--card); border:1px solid var(--line); border-radius:14px;
+    padding:15px 17px; box-shadow:var(--shadow); }
+  .step .hd { display:flex; align-items:center; gap:10px; margin-bottom:6px; }
+  .step .n { display:inline-flex; align-items:center; justify-content:center; width:24px; height:24px;
+    border-radius:999px; background:var(--accent); color:#fff; font-size:.8rem; font-weight:700; flex:none; }
+  .step h3 { font-size:1rem; margin:0; }
+  .step p { margin:0; color:var(--muted); font-size:.89rem; }
+  .priv { margin-top:9px; background:var(--priv-soft); border-left:3px solid var(--priv);
+    padding:7px 10px; border-radius:6px; font-size:.82rem; color:var(--ink); }
+  .priv b { color:var(--priv); }
+  .arrow { align-self:center; width:2px; height:20px; background:var(--line); margin:0 auto; position:relative; }
+  .arrow::after { content:""; position:absolute; bottom:0; left:50%; transform:translateX(-50%);
+    border-left:5px solid transparent; border-right:5px solid transparent; border-top:7px solid var(--line); }
+  .flow { display:flex; flex-direction:column; }
+  .human-box { border-color:var(--human); } .human-box .n { background:var(--human); }
+  .warn-box { border-color:var(--warn); } .warn-box .n { background:var(--warn); }
+  .tag { margin-left:auto; font-size:.7rem; font-weight:600; padding:2px 8px; border-radius:999px; }
+  .tag.human { background:var(--human-soft); color:var(--human); }
+  .tag.warn { background:var(--warn-soft); color:var(--warn); }
+  .principles { margin-top:28px; background:var(--card); border:1px solid var(--line);
+    border-radius:14px; padding:18px 20px; box-shadow:var(--shadow); }
+  .principles h2 { font-size:1.05rem; margin:0 0 10px; display:flex; align-items:center; gap:8px; }
+  .principles ul { margin:0; padding-left:18px; }
+  .principles li { font-size:.88rem; margin-bottom:6px; }
+  .principles li b { color:var(--priv); }
+</style>
+<div class="wrap">
+  <h1>Warm Handoff — How It Actually Works</h1>
+  <p class="sub">End-to-end flow across agencies, with the privacy control at every step. Purple = data-privacy safeguard.</p>
+
+  <div class="flow">
+    <div class="lane">Convener · One Roof (or host foundation)</div>
+    <div class="step">
+      <div class="hd"><span class="n">1</span><h3>Owns the tool + directory</h3></div>
+      <p>The CoC lead grants responder logins by agency and keeps the public/synthetic service directory current with "last verified" dates.</p>
+      <div class="priv"><b>Privacy:</b> the directory holds only public service info. No client data lives in the system of record here.</div>
+    </div>
+    <div class="arrow"></div>
+
+    <div class="lane">Sender · frontline responder</div>
+    <div class="step">
+      <div class="hd"><span class="n">2</span><h3>Logs in, enters the situation</h3></div>
+      <p>ER nurse, shelter intake, outreach worker. Enters only situation + eligibility lane (family, DV, youth, veteran, medical).</p>
+      <div class="priv"><b>Privacy:</b> minimum necessary only. No SSN, no identity check, no trauma narrative. Legal name optional.</div>
+    </div>
+    <div class="arrow"></div>
+
+    <div class="step warn-box">
+      <div class="hd"><span class="n">3</span><h3>Tool builds the handoff card</h3><span class="tag warn">source + date</span></div>
+      <p>Matches the directory and generates the card: situation, safe next step, named owner, must-confirm list. Capacity shown as "not live."</p>
+      <div class="priv"><b>Privacy:</b> card is generated in the moment, not written to any client record or HMIS. No profiling or scoring.</div>
+    </div>
+    <div class="arrow"></div>
+
+    <div class="step human-box">
+      <div class="hd"><span class="n">4</span><h3>Get the person's consent</h3><span class="tag human">consent</span></div>
+      <p>Before anything is shared, the responder gets the person's verbal OK to send their info to the named receiving agency.</p>
+      <div class="priv"><b>Privacy:</b> the person controls their own information. Consent is logged as a simple yes/no, nothing more.</div>
+    </div>
+    <div class="arrow"></div>
+
+    <div class="step human-box">
+      <div class="hd"><span class="n">5</span><h3>Human confirms by phone</h3><span class="tag human">human in loop</span></div>
+      <p>Responder calls the receiving agency to confirm the bed and eligibility. The tool never asserts availability itself.</p>
+      <div class="priv"><b>Privacy:</b> a trained person makes the placement decision. No automated eligibility or placement.</div>
+    </div>
+    <div class="arrow"></div>
+
+    <div class="lane">Receiver · receiving agency</div>
+    <div class="step">
+      <div class="hd"><span class="n">6</span><h3>Receives the card — no account needed</h3></div>
+      <p>Card arrives as a printout or a secure, expiring link. The agency reads it and skips re-intake.</p>
+      <div class="priv"><b>Privacy:</b> link is encrypted, single-purpose, and expires. Shared only with the one agency the person consented to.</div>
+    </div>
+    <div class="arrow"></div>
+
+    <div class="step">
+      <div class="hd"><span class="n">7</span><h3>Person received · follow-up owned · card expires</h3></div>
+      <p>Named owner tracks until the person is received within the follow-up window. The card is not retained after use.</p>
+      <div class="priv"><b>Privacy:</b> ephemeral by default. Short retention, then auto-purge. One Roof / HMIS stays the system of record.</div>
+    </div>
+  </div>
+
+  <div class="principles">
+    <h2>🔒 Data privacy in one glance</h2>
+    <ul>
+      <li><b>Minimum necessary:</b> collect only what the referral needs; no identity verification.</li>
+      <li><b>Consent-first:</b> nothing is shared without the person's yes.</li>
+      <li><b>No system of record:</b> the card is generated and passed, never stored as a client file; One Roof / HMIS remains authoritative.</li>
+      <li><b>Ephemeral sharing:</b> expiring, encrypted, single-agency links; short retention then purge.</li>
+      <li><b>No profiling:</b> no risk or vulnerability scoring of any person.</li>
+      <li><b>Human decides:</b> every placement is phone-confirmed by a trained person.</li>
+    </ul>
+  </div>
+</div>
