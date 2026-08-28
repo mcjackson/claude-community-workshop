@@ -1,0 +1,11 @@
+service_id,name,public_resource_type,serves,accommodations,area,contact,last_verified,capacity_is_not_live,is_synthetic
+SVC-01,Southside Medical Respite,medical respite,Adults recently discharged,wheelchair accessible,Southside,(205) 555-0142,2026-08-27,true,true
+SVC-02,Cahaba Recovery Respite,medical respite,Short-term recovery beds,referral form,Woodlawn,(205) 555-0177,2026-08-26,true,true
+SVC-03,Magic City Family Haven,family shelter,Families with children,cribs,Downtown,(205) 555-0110,2026-08-27,true,true
+SVC-04,East Lake Family Shelter,family shelter,Families; DV-safe intake,DV-safe;children,East Lake,(205) 555-0198,2026-08-25,true,true
+SVC-05,Red Mountain Shelter,pet-friendly shelter bed,Adults with pets,on-site kennels,Southtown,(205) 555-0163,2026-08-27,true,true
+SVC-06,Downtown Cooling Center,cooling center,Anyone (daytime),water;AC,City Center,(205) 555-0120,2026-08-28,true,true
+SVC-07,Norwood Cooling Site,cooling center,Anyone (daytime),water,Norwood,(205) 555-0134,2026-08-28,true,true
+SVC-08,Vulcan Youth Transitions,youth transitional housing,Young adults 18-24,ID assistance,Five Points,(205) 555-0155,2026-08-24,true,true
+SVC-09,First Light Day Center,daytime drop-in center,Adults,showers;charging,Downtown,(205) 555-0188,2026-08-27,true,true
+SVC-10,Common Ground Drop-In,daytime drop-in center,Adults,mail;charging,Avondale,(205) 555-0171,2026-08-26,true,true
