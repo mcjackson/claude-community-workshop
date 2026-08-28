@@ -1,0 +1,125 @@
+<title>Warm Handoff Flow</title>
+<style>
+  :root {
+    --bg: #f7f6f3;
+    --card: #ffffff;
+    --ink: #1c1c1a;
+    --muted: #5f5c55;
+    --line: #c9c4ba;
+    --accent: #2f6b5e;
+    --accent-soft: #e3efeb;
+    --warn: #9a5b1e;
+    --warn-soft: #f6ebdd;
+    --human: #3a4a7a;
+    --human-soft: #e6e9f4;
+    --shadow: 0 1px 3px rgba(0,0,0,.08), 0 6px 18px rgba(0,0,0,.05);
+  }
+  :root:not([data-theme="light"]) {
+    @media (prefers-color-scheme: dark) {
+      --bg:#16171a; --card:#212327; --ink:#eceae4; --muted:#a3a09a;
+      --line:#3a3d43; --accent:#6fb9a6; --accent-soft:#20302c;
+      --warn:#e0a866; --warn-soft:#332a1e; --human:#9fb0e0; --human-soft:#232838;
+      --shadow:0 1px 3px rgba(0,0,0,.4), 0 6px 20px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg:#16171a; --card:#212327; --ink:#eceae4; --muted:#a3a09a;
+    --line:#3a3d43; --accent:#6fb9a6; --accent-soft:#20302c;
+    --warn:#e0a866; --warn-soft:#332a1e; --human:#9fb0e0; --human-soft:#232838;
+    --shadow:0 1px 3px rgba(0,0,0,.4), 0 6px 20px rgba(0,0,0,.35);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.5; padding: 32px 20px 48px;
+  }
+  .wrap { max-width: 720px; margin: 0 auto; }
+  h1 { font-size: 1.5rem; margin: 0 0 4px; letter-spacing: -.01em; }
+  .sub { color: var(--muted); font-size: .95rem; margin: 0 0 28px; }
+  .flow { display: flex; flex-direction: column; align-items: stretch; gap: 0; }
+  .step {
+    background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+    padding: 16px 18px; box-shadow: var(--shadow); position: relative;
+  }
+  .step .n {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 24px; height: 24px; border-radius: 999px; background: var(--accent);
+    color: #fff; font-size: .8rem; font-weight: 700; margin-right: 10px; flex: none;
+  }
+  .step .hd { display: flex; align-items: center; margin-bottom: 6px; }
+  .step .hd h3 { font-size: 1.02rem; margin: 0; }
+  .step p { margin: 0; color: var(--muted); font-size: .9rem; }
+  .tag {
+    display: inline-block; font-size: .72rem; font-weight: 600; padding: 2px 8px;
+    border-radius: 999px; margin-left: auto;
+  }
+  .tag.human { background: var(--human-soft); color: var(--human); }
+  .tag.warn { background: var(--warn-soft); color: var(--warn); }
+  .arrow { align-self: center; width: 2px; height: 22px; background: var(--line); position: relative; }
+  .arrow::after {
+    content: ""; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+    border-left: 5px solid transparent; border-right: 5px solid transparent;
+    border-top: 7px solid var(--line);
+  }
+  .human-box { border-color: var(--human); }
+  .human-box .n { background: var(--human); }
+  .warn-box { border-color: var(--warn); }
+  .warn-box .n { background: var(--warn); }
+  .legend { margin-top: 26px; font-size: .82rem; color: var(--muted); display: flex; gap: 18px; flex-wrap: wrap; }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .dot { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+</style>
+<div class="wrap">
+  <h1>Warm Handoff Summary — Pilot Flow</h1>
+  <p class="sub">Challenge 4 · one bounded decision point: "what safe next step, confirmed by whom?"</p>
+
+  <div class="flow">
+    <div class="step">
+      <div class="hd"><span class="n">1</span><h3>Responder opens the tool</h3></div>
+      <p>ER discharge nurse, shelter intake worker, street outreach, or 211 operator. The person experiencing homelessness is the subject, not the operator.</p>
+    </div>
+    <div class="arrow"></div>
+
+    <div class="step">
+      <div class="hd"><span class="n">2</span><h3>Enters the situation</h3></div>
+      <p>A few fields only: immediate needs, safety constraints, key eligibility factors (e.g. family, DV, youth, veteran, medical). No SSN, no sensitive detail stored.</p>
+    </div>
+    <div class="arrow"></div>
+
+    <div class="step">
+      <div class="hd"><span class="n">3</span><h3>Tool matches the service directory</h3><span class="tag warn">source + date</span></div>
+      <p>Curated, clearly-synthetic Birmingham directory. Every option shows eligibility notes and a "last verified" date. It never claims a live open bed.</p>
+    </div>
+    <div class="arrow"></div>
+
+    <div class="step">
+      <div class="hd"><span class="n">4</span><h3>Generates the Warm Handoff Summary</h3></div>
+      <p>Three sections: current situation · confirmed-safe next steps with a named follow-up owner · a "must confirm before handoff" checklist.</p>
+    </div>
+    <div class="arrow"></div>
+
+    <div class="step warn-box">
+      <div class="hd"><span class="n">5</span><h3>Must-confirm checklist</h3><span class="tag warn">uncertainty flagged</span></div>
+      <p>Anything the tool can't guarantee (bed availability, eligibility) is flagged red, not asserted as fact.</p>
+    </div>
+    <div class="arrow"></div>
+
+    <div class="step human-box">
+      <div class="hd"><span class="n">6</span><h3>Human confirms with receiving agency</h3><span class="tag human">human in the loop</span></div>
+      <p>Responder calls to confirm the bed and eligibility. This is the required human-review point — the tool assists, a trained person decides.</p>
+    </div>
+    <div class="arrow"></div>
+
+    <div class="step human-box">
+      <div class="hd"><span class="n">7</span><h3>Summary shared + follow-up owned</h3><span class="tag human">accountability</span></div>
+      <p>Receiving agency gets the summary (print or secure link) so the person doesn't re-tell their story. Named owner tracks until the person is received.</p>
+    </div>
+  </div>
+
+  <div class="legend">
+    <span><span class="dot" style="background:var(--accent)"></span> Automated step</span>
+    <span><span class="dot" style="background:var(--warn)"></span> Uncertainty / verify</span>
+    <span><span class="dot" style="background:var(--human)"></span> Human decision</span>
+  </div>
+</div>

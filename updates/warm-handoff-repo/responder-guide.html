@@ -1,0 +1,144 @@
+<title>Responder Guide & Why It's Better</title>
+<style>
+  :root{
+    --bg:#eef1f6; --panel:#ffffff; --ink:#18202e; --muted:#5c6675; --faint:#8b95a4;
+    --line:#e2e7ee; --line2:#d3dae3;
+    --accent:#127566; --accent-ink:#0d5849; --accent-soft:#e4f1ee;
+    --warn:#9a5b1e; --warn-soft:#fbeedd; --warn-line:#eccfa3;
+    --red:#a3352e; --red-soft:#fbe9e7; --red-line:#eec4bf;
+    --ok:#1c7a3c; --ok-soft:#e6f4ea;
+    --shadow:0 2px 6px rgba(20,30,50,.06), 0 12px 30px rgba(20,30,50,.07);
+    --font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,system-ui,sans-serif;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);line-height:1.5;padding:26px 16px 56px;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:680px;margin:0 auto;}
+  .eyebrow{font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin:0 0 5px;}
+  h1{font-size:1.55rem;margin:0 0 4px;letter-spacing:-.015em;}
+  .lede{color:var(--muted);font-size:.95rem;margin:0 0 22px;}
+  .card{background:var(--panel);border:1px solid var(--line2);border-radius:16px;box-shadow:var(--shadow);padding:20px 22px;margin-bottom:18px;}
+  h2{font-size:1.05rem;margin:0 0 14px;letter-spacing:-.01em;display:flex;align-items:center;gap:9px;}
+
+  /* before/after table */
+  table{width:100%;border-collapse:collapse;font-size:.88rem;}
+  th{text-align:left;font-size:.7rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--faint);padding:0 10px 8px;border-bottom:1px solid var(--line2);}
+  th.after{color:var(--accent);}
+  td{padding:11px 10px;vertical-align:top;border-bottom:1px solid var(--line);}
+  td.dim{color:var(--muted);width:47%;}
+  td.after{width:53%;} td.after b{color:var(--accent-ink);}
+  tr:last-child td{border-bottom:0;}
+  .aspect{font-weight:600;font-size:.78rem;color:var(--faint);text-transform:uppercase;letter-spacing:.03em;padding-top:13px;}
+
+  /* steps */
+  ol.steps{list-style:none;counter-reset:s;margin:0;padding:0;}
+  ol.steps li{counter-increment:s;position:relative;padding:0 0 15px 40px;}
+  ol.steps li::before{content:counter(s);position:absolute;left:0;top:-2px;width:26px;height:26px;border-radius:999px;background:var(--accent);color:#fff;font-weight:700;font-size:.82rem;display:flex;align-items:center;justify-content:center;}
+  ol.steps li:last-child{padding-bottom:0;}
+  ol.steps b{color:var(--ink);}
+  ol.steps .say{font-size:.83rem;color:var(--muted);font-style:italic;margin-top:2px;}
+
+  .emg{display:flex;gap:9px;align-items:flex-start;background:var(--red-soft);border:1px solid var(--red-line);border-radius:10px;padding:11px 14px;font-size:.85rem;color:#6d211b;margin-bottom:16px;}
+  .emg b{color:var(--red);}
+
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  @media(max-width:520px){.cols{grid-template-columns:1fr;}}
+  .mini{border:1px solid var(--line2);border-radius:11px;padding:13px 15px;}
+  .mini.yes{background:var(--ok-soft);border-color:#bfe3cb;}
+  .mini.no{background:var(--red-soft);border-color:var(--red-line);}
+  .mini h3{margin:0 0 8px;font-size:.85rem;}
+  .mini.yes h3{color:var(--ok);} .mini.no h3{color:var(--red);}
+  .mini ul{margin:0;padding-left:16px;} .mini li{font-size:.85rem;margin-bottom:5px;}
+  .principle{background:var(--accent-soft);border-radius:10px;padding:12px 15px;font-size:.9rem;color:var(--accent-ink);margin-top:14px;}
+  .principle b{font-weight:700;}
+</style>
+<div class="wrap">
+  <p class="eyebrow">Birmingham · Challenge 4 · Responder Guide</p>
+  <h1>The Warm Handoff, and why it beats today</h1>
+  <p class="lede">A one-page guide for frontline responders, plus how this improves on what gets captured now.</p>
+
+  <!-- BEFORE / AFTER -->
+  <div class="card">
+    <h2>What's captured today vs. on the card</h2>
+    <table>
+      <tr><th>Today (status quo)</th><th class="after">Warm Handoff card</th></tr>
+      <tr>
+        <td colspan="2" class="aspect">At the moment of contact</td>
+      </tr>
+      <tr>
+        <td class="dim">Nothing standardized. A verbal "try that shelter" or a scribbled number.</td>
+        <td class="after"><b>A structured next step</b> anyone can produce in two minutes, no HMIS login.</td>
+      </tr>
+      <tr>
+        <td class="dim">Availability assumed. People sent to full or closed services.</td>
+        <td class="after"><b>Confirmation + freshness.</b> "Confirm before travel; capacity not live."</td>
+      </tr>
+      <tr>
+        <td class="dim">No one owns what happens next. Handoff drops when the responder leaves.</td>
+        <td class="after"><b>Named owner + follow-up window.</b> Accountability is a person.</td>
+      </tr>
+      <tr>
+        <td class="dim">Handoff is anonymous and untracked. No way to know they arrived.</td>
+        <td class="after"><b>First name + handoff code + ahead-call</b> link sender and receiver.</td>
+      </tr>
+      <tr>
+        <td class="dim">The ride is captured nowhere. The last mile fails silently.</td>
+        <td class="after"><b>Transportation is a required field.</b> A bed with no ride isn't a plan.</td>
+      </tr>
+      <tr>
+        <td class="dim">Person re-tells their whole story at every door.</td>
+        <td class="after"><b>Portable summary</b> travels with the person. No repeated intake.</td>
+      </tr>
+      <tr>
+        <td class="dim">Assessment tools may score or label the person; records persist.</td>
+        <td class="after"><b>Minimum identity, no scoring, no biometrics,</b> not retained.</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- RESPONDER STEPS -->
+  <div class="card">
+    <h2>How to run a handoff (responder steps)</h2>
+    <div class="emg"><span>🚨</span><div><b>Safety and medical first.</b> Immediate danger, medical emergency, or dangerous weather with no shelter? Call 911 or the crisis line and, if you can, transport now. Don't issue a card for an active emergency.</div></div>
+    <ol class="steps">
+      <li><b>Ask what they need, in their words.</b> Get their OK to help find a safe next step.
+        <div class="say">"What would help most right now? Can I help you find somewhere to go?"</div></li>
+      <li><b>Capture the minimum.</b> First name + last initial, the immediate need, the eligibility lane (family, DV, youth, veteran, medical), and any accommodation (service animal, wheelchair, children). Nothing about their history.</li>
+      <li><b>Pick the safe next step and confirm by phone.</b> Is there room, are they eligible, is a form required. The tool never claims a bed is open.</li>
+      <li><b>Arrange the ride.</b> Van, bus pass, voucher, or accompany them. Don't send someone off with no way to get there.</li>
+      <li><b>Call ahead.</b> Give the receiving agency the first name + handoff code so they expect the person.</li>
+      <li><b>Hand off what the person keeps.</b> Their copy, or (no printer) write or say the field script: <i>where to go, the code, who's expecting them.</i> Explain what will happen.</li>
+      <li><b>Owner follows up</b> within the window to confirm the person was received.</li>
+    </ol>
+  </div>
+
+  <!-- DIGNITY: data line -->
+  <div class="card">
+    <h2>How much to capture — the dignity line</h2>
+    <div class="cols">
+      <div class="mini yes">
+        <h3>✓ Capture (need &amp; routing)</h3>
+        <ul>
+          <li>Immediate need</li>
+          <li>Eligibility lane (family, DV, youth, veteran, medical)</li>
+          <li>Accommodations that change the door (service animal, mobility, children)</li>
+          <li>First name + last initial</li>
+          <li>Transportation + consent</li>
+        </ul>
+      </div>
+      <div class="mini no">
+        <h3>✕ Don't capture (the person's story)</h3>
+        <ul>
+          <li>Why they became homeless</li>
+          <li>Medical or mental-health history</li>
+          <li>Criminal history or "risk"</li>
+          <li>Trauma narrative</li>
+          <li>Full legal name, SSN, ID, photo, fingerprint</li>
+        </ul>
+      </div>
+    </div>
+    <div class="principle"><b>The rule:</b> capture the need, not the person's story. Add detail only when it changes where they go, never to build a file. More questions is not more help — it's more burden. Ask, don't interrogate.</div>
+  </div>
+
+  <p style="font-size:.77rem;color:var(--faint);text-align:center;margin-top:6px;">Synthetic demonstration. Feeds, does not replace, Coordinated Entry (One Roof / HMIS is the system of record).</p>
+</div>

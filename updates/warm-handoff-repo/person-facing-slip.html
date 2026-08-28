@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<title>Warm Handoff — Person's Slip</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  :root {
+    --bg: #eef1f6;
+    --card: #ffffff;
+    --ink: #1b2430;
+    --ink-soft: #4a5568;
+    --teal: #127566;
+    --teal-dark: #0c5148;
+    --teal-tint: #e3f2ef;
+    --border: #d7dde6;
+    --warn-bg: #fff4e5;
+    --warn-border: #e8b660;
+    --warn-ink: #6b4a12;
+    --mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    padding: 24px 16px 64px;
+  }
+
+  .wrap {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  header.page-head {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  header.page-head h1 {
+    font-size: 1.5rem;
+    margin: 0 0 4px;
+    color: var(--teal-dark);
+  }
+
+  header.page-head p {
+    margin: 0;
+    color: var(--ink-soft);
+    font-size: 0.95rem;
+  }
+
+  .synthetic-banner {
+    background: var(--warn-bg);
+    border: 1px solid var(--warn-border);
+    color: var(--warn-ink);
+    border-radius: 10px;
+    padding: 10px 16px;
+    font-size: 0.85rem;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  .controls {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 18px 20px;
+    margin-bottom: 24px;
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    gap: 14px;
+    align-items: end;
+  }
+
+  @media (max-width: 640px) {
+    .controls { grid-template-columns: 1fr; }
+  }
+
+  .field label {
+    display: block;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--ink-soft);
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+
+  .field select, .field input[type="text"] {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 1rem;
+    font-family: var(--sans);
+    background: #fff;
+    color: var(--ink);
+  }
+
+  .field select:focus, .field input:focus {
+    outline: 2px solid var(--teal);
+    outline-offset: 1px;
+    border-color: var(--teal);
+  }
+
+  button.regen {
+    padding: 10px 16px;
+    border-radius: 8px;
+    border: 1px solid var(--teal);
+    background: var(--teal-tint);
+    color: var(--teal-dark);
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 0.9rem;
+    white-space: nowrap;
+  }
+  button.regen:hover { background: #d3ebe5; }
+
+  .outputs {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    gap: 24px;
+    align-items: start;
+  }
+
+  @media (max-width: 760px) {
+    .outputs { grid-template-columns: 1fr; }
+  }
+
+  section.card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    box-shadow: 0 1px 3px rgba(20, 30, 40, 0.06);
+    overflow: hidden;
+  }
+
+  .card-head {
+    padding: 16px 22px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .card-head h2 {
+    margin: 0;
+    font-size: 1.05rem;
+    color: var(--teal-dark);
+  }
+
+  .card-head .sub {
+    font-size: 0.78rem;
+    color: var(--ink-soft);
+  }
+
+  /* ---- Person's slip ---- */
+
+  #slip-body {
+    padding: 26px 24px 22px;
+  }
+
+  .slip-greeting {
+    font-size: 1.35rem;
+    font-weight: 700;
+    margin: 0 0 4px;
+    color: var(--ink);
+  }
+
+  .slip-greeting .name-fill {
+    color: var(--teal-dark);
+  }
+
+  .slip-sub {
+    color: var(--ink-soft);
+    margin: 0 0 20px;
+    font-size: 1rem;
+  }
+
+  .slip-row {
+    display: grid;
+    grid-template-columns: 130px 1fr;
+    gap: 10px;
+    padding: 14px 0;
+    border-top: 1px solid #eef0f4;
+  }
+
+  .slip-row:first-of-type { border-top: none; }
+
+  .slip-label {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--ink-soft);
+    font-weight: 700;
+    padding-top: 3px;
+  }
+
+  .slip-value {
+    font-size: 1.15rem;
+    line-height: 1.4;
+  }
+
+  .slip-value .place-name {
+    font-weight: 700;
+  }
+
+  .slip-value .place-meta {
+    display: block;
+    font-size: 0.95rem;
+    color: var(--ink-soft);
+    margin-top: 2px;
+  }
+
+  .code-box {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 1.6rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    background: var(--teal-tint);
+    color: var(--teal-dark);
+    border: 2px solid var(--teal);
+    border-radius: 10px;
+    padding: 6px 16px;
+  }
+
+  .expect-box {
+    background: #f7f9fb;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 18px;
+    margin: 18px 0;
+    font-size: 1.02rem;
+    line-height: 1.5;
+  }
+
+  .expect-box h3 {
+    margin: 0 0 8px;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--teal-dark);
+  }
+
+  .safety-note {
+    background: var(--teal-tint);
+    border: 1px solid var(--teal);
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin-top: 16px;
+    font-size: 1.05rem;
+    line-height: 1.5;
+    color: var(--teal-dark);
+    font-weight: 600;
+  }
+
+  .slip-foot {
+    padding: 14px 24px 20px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .window-pill {
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+  }
+
+  .print-btn {
+    background: var(--teal);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 18px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .print-btn:hover { background: var(--teal-dark); }
+
+  /* ---- Field mode ---- */
+
+  #field-body {
+    padding: 22px 22px 20px;
+  }
+
+  .field-script {
+    font-family: var(--mono);
+    background: #10201d;
+    color: #eafff9;
+    border-radius: 10px;
+    padding: 18px 20px;
+    line-height: 1.9;
+    font-size: 1rem;
+    white-space: pre-wrap;
+  }
+
+  .field-script .code-inline {
+    color: #7de8cf;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+  }
+
+  .field-note {
+    margin-top: 16px;
+    font-size: 0.88rem;
+    color: var(--ink-soft);
+    background: #f7f9fb;
+    border: 1px dashed var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+    line-height: 1.5;
+  }
+
+  .field-note strong {
+    color: var(--ink);
+  }
+
+  .card-card-hint {
+    font-size: 0.8rem;
+    color: var(--ink-soft);
+    margin-top: 14px;
+    line-height: 1.4;
+  }
+
+  footer.page-foot {
+    text-align: center;
+    color: var(--ink-soft);
+    font-size: 0.78rem;
+    margin-top: 32px;
+  }
+
+  /* Print rules: only the person's slip prints */
+  @media print {
+    body { background: #fff; padding: 0; }
+    .controls, .synthetic-banner, #field-card, .slip-foot .print-btn, footer.page-foot, header.page-head { display: none !important; }
+    .outputs { display: block; }
+    #slip-card {
+      border: none;
+      box-shadow: none;
+      border-radius: 0;
+    }
+    .card-head { border-bottom: 2px solid var(--teal); }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="page-head">
+    <h1>Warm Handoff — Your Next Step</h1>
+    <p>Everything you need to get where you're going.</p>
+  </header>
+
+  <div class="synthetic-banner">
+    This is synthetic demo data for a hackathon project. No real person, place, or record.
+  </div>
+
+  <div class="controls">
+    <div class="field">
+      <label for="scenario-select">Scenario</label>
+      <select id="scenario-select"></select>
+    </div>
+    <div class="field">
+      <label for="name-input">First name</label>
+      <input type="text" id="name-input" placeholder="e.g. Jordan" maxlength="30">
+    </div>
+    <button class="regen" id="regen-btn" type="button">New code</button>
+  </div>
+
+  <div class="outputs">
+
+    <!-- (A) Person's slip -->
+    <section class="card" id="slip-card">
+      <div class="card-head">
+        <h2>Your Slip</h2>
+        <span class="sub">Keep this with you</span>
+      </div>
+      <div id="slip-body">
+        <p class="slip-greeting">Hi <span class="name-fill" id="slip-name">friend</span>,</p>
+        <p class="slip-sub">Here's where you're headed and what happens next.</p>
+
+        <div class="slip-row">
+          <div class="slip-label">Where you're going</div>
+          <div class="slip-value">
+            <span class="place-name" id="slip-place">—</span>
+            <span class="place-meta" id="slip-place-meta">—</span>
+          </div>
+        </div>
+
+        <div class="slip-row">
+          <div class="slip-label">Your code</div>
+          <div class="slip-value"><span class="code-box" id="slip-code">----</span></div>
+        </div>
+
+        <div class="slip-row">
+          <div class="slip-label">Your ride</div>
+          <div class="slip-value" id="slip-ride">—</div>
+        </div>
+
+        <div class="slip-row">
+          <div class="slip-label">Who's expecting you</div>
+          <div class="slip-value" id="slip-owner">—</div>
+        </div>
+
+        <div class="expect-box">
+          <h3>What to expect when you arrive</h3>
+          <div id="slip-expect">—</div>
+        </div>
+
+        <div class="safety-note">
+          If something goes wrong, <span id="slip-owner-inline">this person</span> is expecting you. Just say your name and your code.
+        </div>
+      </div>
+      <div class="slip-foot">
+        <span class="window-pill">Please arrive: <strong id="slip-window">—</strong></span>
+        <button class="print-btn" onclick="window.print()">Print this slip</button>
+      </div>
+    </section>
+
+    <!-- (B) Field mode -->
+    <section class="card" id="field-card">
+      <div class="card-head">
+        <h2>Field Mode</h2>
+        <span class="sub">No printer needed</span>
+      </div>
+      <div id="field-body">
+        <div class="field-script" id="field-script">
+Go to —.
+Your code is <span class="code-inline">----</span>.
+Ask for — — they're expecting you.
+        </div>
+        <div class="field-note">
+          <strong>No phone needed.</strong> The full record travels responder-phone to receiver-phone through the ahead-call — the person only needs to remember their code.
+        </div>
+        <p class="card-card-hint">Read this aloud, or copy it onto any scrap paper or index card. Three lines is all it takes.</p>
+      </div>
+    </section>
+
+  </div>
+
+  <footer class="page-foot">Warm Handoff · Birmingham homelessness-services hackathon project · synthetic data only</footer>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var PROVIDERS = {
+    "Medical respite": { name: "Southside Medical Respite", area: "Southside", phone: "(205) 555-0142" },
+    "Cooling center": { name: "Eastlake Cooling Center", area: "Eastlake", phone: "(205) 555-0187" },
+    "Pet-friendly shelter bed": { name: "Roebuck Pet-Friendly Shelter", area: "Roebuck", phone: "(205) 555-0119" },
+    "Family shelter": { name: "Woodlawn Family Shelter", area: "Woodlawn", phone: "(205) 555-0163" },
+    "Youth transitional housing": { name: "Avondale Youth Housing", area: "Avondale", phone: "(205) 555-0155" },
+    "Daytime drop-in center": { name: "Norwood Daytime Center", area: "Norwood", phone: "(205) 555-0138" }
+  };
+
+  var SCENARIOS = [
+    {
+      id: "SCEN-05",
+      label: "Hospital discharge — short-term respite bed",
+      context: "hospital discharge",
+      need: "short-term respite bed",
+      resourceType: "Medical respite",
+      ownerRole: "Healthcare case manager",
+      ownerName: "Renee Talbot",
+      window: "within 24 hours",
+      expect: "A nurse or case manager will check you in and get you settled in a bed to rest and recover. They'll go over any follow-up care you need.",
+      ride: "A hospital transport van will take you there directly from discharge."
+    },
+    {
+      id: "SCEN-01",
+      label: "Sleeping outside in heat — shade + water",
+      context: "sleeping outside in heat",
+      need: "shade and water",
+      resourceType: "Cooling center",
+      ownerRole: "Frontline responder",
+      ownerName: "Marcus Whitfield",
+      window: "within 2 hours",
+      expect: "Walk in and tell staff at the front desk your name and code. You'll get a cool place to sit, water, and a chance to rest out of the heat.",
+      ride: "You can walk there, or ask the responder who gave you this slip for a ride."
+    },
+    {
+      id: "SCEN-02",
+      label: "Adult with a pet — overnight pet-friendly shelter",
+      context: "traveling with a pet",
+      need: "overnight pet-friendly shelter",
+      resourceType: "Pet-friendly shelter bed",
+      ownerRole: "Coordinated entry access point",
+      ownerName: "Dana Ochoa",
+      window: "within 4 hours",
+      expect: "Staff will welcome you and your pet together — no separation. They'll show you both to a bed for the night and go over house rules.",
+      ride: "A coordinated entry van can pick you and your pet up — ask your responder to confirm."
+    },
+    {
+      id: "SCEN-03",
+      label: "Family with children — emergency family shelter",
+      context: "family with children needing shelter",
+      need: "emergency family shelter",
+      resourceType: "Family shelter",
+      ownerRole: "Coordinated entry access point",
+      ownerName: "Patrice Coleman",
+      window: "same day",
+      expect: "Staff will welcome your whole family and get everyone checked in together, including your kids. They'll show you your room and explain meal times.",
+      ride: "Coordinated entry can arrange transportation for your whole family — ask your responder."
+    },
+    {
+      id: "SCEN-04",
+      label: "Young adult aging out of foster care — transitional housing",
+      context: "aging out of foster care",
+      need: "transitional housing",
+      resourceType: "Youth transitional housing",
+      ownerRole: "Youth services provider",
+      ownerName: "Jalen Ford",
+      window: "within 3 days",
+      expect: "A youth services staff member will meet with you one-on-one, show you your room, and start a plan with you for next steps like school, work, or ID.",
+      ride: "Youth services can pick you up — ask your responder for the pickup time."
+    },
+    {
+      id: "SCEN-06",
+      label: "Daytime services + phone charge — daytime drop-in",
+      context: "needing daytime services",
+      need: "a place to charge a phone and get daytime services",
+      resourceType: "Daytime drop-in center",
+      ownerRole: "Frontline responder",
+      ownerName: "Ivy Nguyen",
+      window: "same day",
+      expect: "Walk in any time during open hours. You can charge your phone, get a meal, take a shower, and talk with staff about next steps.",
+      ride: "You can walk there, or ask the responder who gave you this slip for a ride."
+    }
+  ];
+
+  var CODE_CHARS = "23456789ABCDEFGHJKMNPQRSTUVWXYZ"; // no 0/O/1/I/L confusion
+
+  function genCode() {
+    var code = "";
+    for (var i = 0; i < 4; i++) {
+      code += CODE_CHARS[Math.floor(Math.random() * CODE_CHARS.length)];
+    }
+    return code;
+  }
+
+  var els = {
+    select: document.getElementById("scenario-select"),
+    nameInput: document.getElementById("name-input"),
+    regenBtn: document.getElementById("regen-btn"),
+    slipName: document.getElementById("slip-name"),
+    slipPlace: document.getElementById("slip-place"),
+    slipPlaceMeta: document.getElementById("slip-place-meta"),
+    slipCode: document.getElementById("slip-code"),
+    slipRide: document.getElementById("slip-ride"),
+    slipOwner: document.getElementById("slip-owner"),
+    slipOwnerInline: document.getElementById("slip-owner-inline"),
+    slipExpect: document.getElementById("slip-expect"),
+    slipWindow: document.getElementById("slip-window"),
+    fieldScript: document.getElementById("field-script")
+  };
+
+  var state = {
+    code: genCode()
+  };
+
+  function populateSelect() {
+    SCENARIOS.forEach(function (s, idx) {
+      var opt = document.createElement("option");
+      opt.value = String(idx);
+      opt.textContent = s.id + " — " + s.label;
+      els.select.appendChild(opt);
+    });
+  }
+
+  function escapeHtml(str) {
+    var div = document.createElement("div");
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  function render() {
+    var idx = parseInt(els.select.value, 10) || 0;
+    var scen = SCENARIOS[idx];
+    var provider = PROVIDERS[scen.resourceType];
+    var rawName = els.nameInput.value.trim();
+    var name = rawName ? escapeHtml(rawName) : "friend";
+    var code = state.code;
+
+    els.slipName.textContent = name;
+    els.slipPlace.textContent = provider.name;
+    els.slipPlaceMeta.textContent = provider.area + " · " + provider.phone;
+    els.slipCode.textContent = code;
+    els.slipRide.textContent = scen.ride;
+    els.slipOwner.textContent = scen.ownerName + " (" + scen.ownerRole + ")";
+    els.slipOwnerInline.textContent = scen.ownerName;
+    els.slipExpect.textContent = scen.expect;
+    els.slipWindow.textContent = scen.window + " — please call ahead to confirm, availability can change";
+
+    var scriptText =
+      "Go to " + provider.name + " (" + provider.area + ").\n" +
+      "Your code is " + code + ".\n" +
+      "Ask for " + scen.ownerName + " — they're expecting you.";
+    els.fieldScript.innerHTML =
+      "Go to " + escapeHtml(provider.name) + " (" + escapeHtml(provider.area) + ").\n" +
+      "Your code is <span class=\"code-inline\">" + escapeHtml(code) + "</span>.\n" +
+      "Ask for " + escapeHtml(scen.ownerName) + " — they're expecting you.";
+  }
+
+  function regenCode() {
+    state.code = genCode();
+    render();
+  }
+
+  populateSelect();
+  els.select.addEventListener("change", render);
+  els.nameInput.addEventListener("input", render);
+  els.regenBtn.addEventListener("click", regenCode);
+
+  render();
+})();
+</script>
+
+</body>
+</html>

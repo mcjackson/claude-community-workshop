@@ -1,0 +1,143 @@
+<title>Handoff Step Flow</title>
+<style>
+  :root{
+    --bg:#f5f7fa; --panel:#ffffff; --ink:#1a2230; --muted:#5b6675; --line:#d8dee6;
+    --accent:#1f7a68; --accent-soft:#e6f2ef; --accent-ink:#0f5749;
+    --warn:#9a5b1e; --warn-soft:#fbeedd; --warn-line:#e6c79c;
+    --human:#2f4a86; --human-soft:#e9edf7;
+    --owner:#3a2f6b; --owner-soft:#ece8f6; --owner-line:#cbc0e8;
+    --font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,system-ui,sans-serif;
+    --shadow:0 1px 2px rgba(20,30,50,.06), 0 6px 18px rgba(20,30,50,.05);
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);line-height:1.45;padding:26px 16px 44px;}
+  .wrap{max-width:1160px;margin:0 auto;}
+  h1{font-size:1.35rem;margin:0 0 3px;}
+  .sub{color:var(--muted);font-size:.9rem;margin:0 0 22px;}
+  .scroll{overflow-x:auto;padding-bottom:8px;}
+  .grid{display:grid;grid-template-columns:repeat(7,168px);gap:0;min-width:1176px;}
+  .col{padding:0 8px;position:relative;}
+
+  /* step box */
+  .step{background:var(--panel);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);
+    padding:12px 12px;min-height:104px;position:relative;}
+  .step .n{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:999px;
+    background:var(--accent);color:#fff;font-size:.76rem;font-weight:700;margin-bottom:7px;}
+  .step h3{font-size:.9rem;margin:0 0 3px;letter-spacing:-.005em;}
+  .step p{font-size:.76rem;color:var(--muted);margin:0;}
+  .step.start .n{background:var(--warn);}
+  .step.start{border-color:var(--warn-line);background:var(--warn-soft);}
+  .step.tool .n{background:#6b7280;}
+  .step.gate{border-color:#c9d4ec;background:var(--human-soft);}
+  .step.gate .n{background:var(--human);}
+
+  /* horizontal arrow between steps */
+  .col:not(:last-child) .step::after{content:"";position:absolute;top:52px;right:-8px;width:16px;height:2px;background:var(--line);z-index:2;}
+  .col:not(:last-child) .step::before{content:"";position:absolute;top:48px;right:-9px;z-index:3;
+    border-top:5px solid transparent;border-bottom:5px solid transparent;border-left:7px solid var(--muted);}
+
+  /* dependents zone: reserved in every column so the owner lane stays aligned */
+  .deps{min-height:172px;padding-top:6px;}
+  .downarrow{width:2px;height:16px;background:var(--human);margin:2px auto 6px;position:relative;}
+  .downarrow::after{content:"";position:absolute;bottom:-1px;left:50%;transform:translateX(-50%);
+    border-left:4px solid transparent;border-right:4px solid transparent;border-top:6px solid var(--human);}
+  .dep{background:#fff;border:1px solid #c9d4ec;border-left:3px solid var(--human);border-radius:8px;
+    padding:7px 9px;margin-bottom:7px;font-size:.74rem;color:#2c3752;box-shadow:var(--shadow);}
+  .dep b{color:var(--human);}
+  .deps .cap{font-size:.66rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--human);margin-bottom:5px;}
+
+  /* owner lane */
+  .ownerlabel{font-size:.7rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--owner);
+    margin:4px 0 6px;}
+  .ownercell{background:var(--owner-soft);border:1px solid var(--owner-line);border-left:0;border-right:0;
+    padding:11px 10px;font-size:.78rem;font-weight:600;color:var(--owner);text-align:center;min-height:46px;
+    display:flex;align-items:center;justify-content:center;}
+  .col:first-child .ownercell{border-left:1px solid var(--owner-line);border-radius:9px 0 0 9px;}
+  .col:last-child .ownercell{border-right:1px solid var(--owner-line);border-radius:0 9px 9px 0;}
+
+  .legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:20px;font-size:.78rem;color:var(--muted);}
+  .legend span{display:inline-flex;align-items:center;gap:6px;}
+  .dot{width:11px;height:11px;border-radius:3px;display:inline-block;}
+  .note{font-size:.78rem;color:var(--muted);margin-top:6px;}
+</style>
+<div class="wrap">
+  <h1>Warm Handoff — Step Flow with Owner Lane</h1>
+  <p class="sub">SCEN-05 (synthetic): adult discharged from hospital, needs a respite bed. Left to right = the flow. Bottom row = who owns each step.</p>
+
+  <div class="scroll">
+    <div class="grid">
+
+      <!-- 1 -->
+      <div class="col">
+        <div class="step start"><span class="n">1</span><h3>Situation arises</h3><p>Person needs a safe next step now.</p></div>
+        <div class="deps"></div>
+        <div class="ownerlabel" style="visibility:hidden">.</div>
+        <div class="ownercell">Frontline responder (ER)</div>
+      </div>
+
+      <!-- 2 -->
+      <div class="col">
+        <div class="step"><span class="n">2</span><h3>Enter minimum info</h3><p>Situation, eligibility lane, initials + immediate need.</p></div>
+        <div class="deps"></div>
+        <div class="ownerlabel" style="visibility:hidden">.</div>
+        <div class="ownercell">ER case manager</div>
+      </div>
+
+      <!-- 3 -->
+      <div class="col">
+        <div class="step tool"><span class="n">3</span><h3>Generate card</h3><p>Safe next step, source + freshness, capacity-not-live flag.</p></div>
+        <div class="deps"></div>
+        <div class="ownerlabel" style="visibility:hidden">.</div>
+        <div class="ownercell">Tool (assists only)</div>
+      </div>
+
+      <!-- 4 with dependents -->
+      <div class="col">
+        <div class="step gate"><span class="n">4</span><h3>Confirm before acting</h3><p>Hard stop. All checks required.</p></div>
+        <div class="deps">
+          <div class="downarrow"></div>
+          <div class="cap">Must confirm</div>
+          <div class="dep"><b>Bed open?</b> Phone-confirm (capacity not live).</div>
+          <div class="dep"><b>Referral form?</b> Confirm if required.</div>
+          <div class="dep"><b>Consent?</b> Person's OK to share.</div>
+        </div>
+        <div class="ownerlabel" style="visibility:hidden">.</div>
+        <div class="ownercell">ER case manager</div>
+      </div>
+
+      <!-- 5 -->
+      <div class="col">
+        <div class="step"><span class="n">5</span><h3>Share card</h3><p>Print or secure expiring link. Receiver needs no account.</p></div>
+        <div class="deps"></div>
+        <div class="ownerlabel" style="visibility:hidden">.</div>
+        <div class="ownercell">ER case manager</div>
+      </div>
+
+      <!-- 6 -->
+      <div class="col">
+        <div class="step"><span class="n">6</span><h3>Person received</h3><p>Receiving agency reads it, skips re-intake.</p></div>
+        <div class="deps"></div>
+        <div class="ownerlabel" style="visibility:hidden">.</div>
+        <div class="ownercell">Medical respite program</div>
+      </div>
+
+      <!-- 7 -->
+      <div class="col">
+        <div class="step"><span class="n">7</span><h3>Follow-up + expire</h3><p>Tracked to window (24h). Card purges, not retained.</p></div>
+        <div class="deps"></div>
+        <div class="ownerlabel" style="visibility:hidden">.</div>
+        <div class="ownercell">Named owner / auto</div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="legend">
+    <span><span class="dot" style="background:var(--warn)"></span> Trigger</span>
+    <span><span class="dot" style="background:var(--accent)"></span> Responder step</span>
+    <span><span class="dot" style="background:#6b7280"></span> Tool assists</span>
+    <span><span class="dot" style="background:var(--human)"></span> Human confirm (hard stop)</span>
+    <span><span class="dot" style="background:var(--owner)"></span> Owner lane</span>
+  </div>
+  <p class="note">The owner lane makes accountability explicit at every step: the tool never owns a decision, a named person does.</p>
+</div>
