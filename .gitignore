@@ -24,5 +24,9 @@ vite.config.ts.timestamp-*
 # Playwright
 test-results
 
-# Generated from docs/homelessness-handoff-scenarios.csv via `npm run db:build`
+# Generated from docs/*.csv via `npm run db:build` (scripts/build-db.mjs) — not committed.
+# No .db/.db3/.sqlite file of any kind is tracked in this repo.
 /data/*.sqlite
+/data/*.sqlite3
+/data/*.db
+/data/*.db3
