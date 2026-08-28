@@ -59,7 +59,9 @@
 			class="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(78,163,169,0.35),transparent_55%),radial-gradient(circle_at_85%_0%,rgba(253,126,15,0.18),transparent_45%)]"
 			aria-hidden="true"
 		></div>
-		<div class="relative mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-28 lg:px-8">
+		<div
+			class="relative mx-auto grid max-w-7xl grid-cols-1 items-center gap-12 px-4 py-20 sm:px-6 sm:py-28 lg:grid-cols-2 lg:px-8"
+		>
 			<div class="max-w-2xl">
 				<p class="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold tracking-wide text-brand-100 uppercase">
 					<span class="h-1.5 w-1.5 rounded-full bg-signal-400"></span>
@@ -92,6 +94,12 @@
 				>
 					See how it works
 				</a>
+			</div>
+
+			<div class="flex justify-center lg:justify-end">
+				<div class="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl sm:max-w-md">
+					<img src="/ai-project.png" alt="CareGrid" class="h-auto w-full" />
+				</div>
 			</div>
 		</div>
 	</section>

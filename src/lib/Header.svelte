@@ -7,19 +7,7 @@
 <header class="sticky top-0 z-50 border-b border-brand-100 bg-white/95 font-sans backdrop-blur">
 	<div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
 		<a href={home} class="flex items-center gap-2.5">
-			<span
-				class="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-700 text-white"
-				aria-hidden="true"
-			>
-				<svg viewBox="0 0 24 24" fill="none" class="h-5 w-5">
-					<path
-						d="M3 21V10L12 3L21 10V21H14V15H10V21H3Z"
-						stroke="currentColor"
-						stroke-width="1.8"
-						stroke-linejoin="round"
-					/>
-				</svg>
-			</span>
+			<img src="/cg-icon.png" alt="" class="h-9 w-9 object-contain" aria-hidden="true" />
 			<span class="text-lg font-bold tracking-tight text-brand-950">CareGrid</span>
 		</a>
 
