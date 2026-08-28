@@ -16,6 +16,7 @@
 			<a href="{home}#how-it-works" class="transition hover:text-brand-950">How it works</a>
 			<a href="{home}#hotlines" class="transition hover:text-brand-950">Hotlines</a>
 			<a href={resolve('/updated-workflow')} class="transition hover:text-brand-950">Updated Workflow</a>
+			<a href={resolve('/architecture')} class="transition hover:text-brand-950">Architecture</a>
 		</div>
 
 		<div class="flex items-center gap-2">
